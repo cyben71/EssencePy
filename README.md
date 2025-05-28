@@ -24,8 +24,9 @@ It brings together reusable utilities, structured code organization, and cross-p
 EssencePy/ 
 ├── app/            # Python applications folder
 ├── config/         # Configuration files (.yaml, .properties, etc.) 
-├── lib/            # Core Python libraries 
-│ └── init/         # Autoloaded classes (e.g., ConfigLoader, AppEnv, etc.) 
+├── lib/            # Core Python libraries
+│ ├── bootstrap/    # Autoloaded main classes (e.g., bootstrap, init_code, AppEnv, ConfigYaml... etc.)
+│ └── init/         # Others external classes
 ├── logs/           # Application logs  (folder automatically created if not existing)
 ├── notebooks/      # Jupyter notebooks for development or analysis 
 ├── scripts/        # Core executable scripts

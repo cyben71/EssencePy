@@ -1,13 +1,16 @@
 __version__ = "1.0.0"
 
-import os
-from appenv import AppEnv
+import os, sys
+from lib.bootstrap.appenv import AppEnv
+#from lib.bootstrap.context import context
 from typing import Optional
 
 class Logger:
     """
     Class for handling actions in log files
     """
+    alias = "log"
+
     
     def __init__(self, app_home: str, app_name: str):
         """Constructor
@@ -17,9 +20,10 @@ class Logger:
         """
         self._application_home = app_home
         self._application_name = app_name
-       
+
         self._log_folder = f"{self._application_home}/log"
         self._log_file = f"{self._application_home}/log/{self._application_name}_{AppEnv.get_current_date()}.log"
+        #self._log_file = f"{self._application_home}/log/{self._application_name}_{context.app.get_current_date()}.log"
     
     
     #######################################

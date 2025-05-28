@@ -20,9 +20,9 @@ log_message() {
 # starting point. current script is launched from this folder
 current_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# going up folders until we find init_code.py in lib/init/ folder
+# going up folders until we find bootstrap.py in lib/bootstrap/ directory
 while [ "$current_dir" != "/" ]; do
-    candidate="$current_dir/lib/init/init_code.py"
+    candidate="$current_dir/lib/bootstrap/bootstrap.py"
     if [ -f "$candidate" ]; then
         export APPLICATION_HOME="$current_dir"
         echo "APPLICATION_HOME: $APPLICATION_HOME"
