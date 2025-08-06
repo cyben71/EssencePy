@@ -18,10 +18,13 @@ Add a bootstrap and python context mecanisms
     > Fix all moved files to use bootstrap and context
     - Cleaning deprecated methods and functions from 'appenv.py'
     - Add get_system() function in 'appenv.py
+    > Fix encoding caracters for log files in logger.py
 5) Under './notebooks':
    > Fix all init cells from notebooks to use bootstrap and context
-5) Under './scripts/shell':
-   > Fix all scripts to use bootstrap
+6) Under './scripts/shell':
+   > Fix all scripts to use bootstrap and recursive search for APPLICATION_HOME
+7) Under './scripts/powershell':
+   > Fix all scripts to use bootstrap and recursive search for APPLICATION_HOME 
 ```
 
 ## Version 1.0.0 (2025-04-29)

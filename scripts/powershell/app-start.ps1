@@ -35,23 +35,25 @@ while ($true) {
 $CONF_DIR = Join-Path $env:APPLICATION_HOME "conf"
 $CONF_FILE = Join-Path $CONF_DIR "env.conf"
 $LOG_DIR = Join-Path $env:APPLICATION_HOME "log"
-$LOG_FILE = Join-Path $LOG_DIR "win_setup_env.log"
+$LOG_FILE = Join-Path $LOG_DIR "win_start_app.log"
+$NOTEBOOK_DIR = Join-Path $env:APPLICATION_HOME "Notebooks"
+$APP_DIR = Join-Path $env:APPLICATION_HOME "app"
 
 # ------------------------------------------------------------------------ #
 
-LogMessage "# ============================= #"
-LogMessage "# === INITIALIZING PROJECT ===  #"
-LogMessage "# ============================= #"
+LogMessage "# =========================== #"
+LogMessage "# === STARING APPLICATION === #"
+LogMessage "# =========================== #"
 LogMessage ""
 
 # create log folder if not exists and log file
-if (!(Test-Path -Path $LOG_DIR -PathType Container)) {
+if (-not (Test-Path -Path $LOG_DIR -PathType Container)) {
     New-Item -Path $LOG_DIR -ItemType Directory
 }
 New-Item -ItemType Directory -Path (Split-Path $LOG_FILE) -Force | Out-Null
 
 # Check config file "env.conf" exists
-if (!(Test-Path -Path $CONF_FILE -PathType Leaf)){
+if (-not (Test-Path -Path $CONF_FILE -PathType Leaf)){
     LogMessage "Error !!! File conf/env.conf not found."
     exit 1
 }
@@ -89,80 +91,57 @@ LogMessage ""
 # ======================================================================== #
 # ======================================================================== #
 
-# Checking parent python exec
-$python = Join-Path $PARENT_PYTHON_HOME $PARENT_PYTHON_EXE
-if (!(Test-Path -Path $python -PathType Leaf)){
-    LogMessage "Error !!! Python exec not found"
-}
-else {
-    LogMessage "Python exec: $python"
+# Select python from virtual env path or parent path
+$python_parent = Join-path $PARENT_PYTHON_HOME $PARENT_PYTHON_EXE 
+$python_venv = Join-path -Path "$VENV_PYTHON_DIR\Scripts" $VENV_PYTHON_EXE
+
+# Initialisation
+$python = $null
+
+# checking virtual python
+if (-not (Test-Path -Path $python_venv -PathType Leaf)) {
+    LogMessage "Virtual python not found in : $python_venv"
+
+    # checking Python parent
+    if (-not (Test-Path -Path $python_parent -PathType Leaf)) {
+        LogMessage "Python parent not found in : $python_parent"
+        LogMessage "Error !!! No Python found !!!"
+        exit 1
+    } else {
+        LogMessage "Python parent found : $python_parent"
+        $python = $python_parent
+    }
+
+} else {
+    LogMessage "Virtual python environment detected : $python_venv"
+    $python = $python_venv
 }
 LogMessage
 
-# creating python virtual env and enabling (after end of creating)
-LogMessage "-----------------------------------------------"
-LogMessage "---- Creating of virtual python environment ---"
-LogMessage "-----------------------------------------------"
 
-# launch command directly with args and get back return code
-& $python -m venv $VENV_PYTHON_DIR      
-$status = $LASTEXITCODE
-if ($status -eq 0){
-    Invoke-Expression $VENV_PYTHON_DIR\Scripts\Activate.ps1
-    $python_venv = Join-Path $VENV_PYTHON_DIR "Scripts\python.exe"
-    LogMessage "Python virtual env successfully created and enabled"
-}
-else {
-    LogMessage "Error !!! Python virtual env fail to created and enabled"
+# Checking argument for execution
+if ($args.Count -lt 1) {
+    LogMessage "Error !!! Usage: .\app-start.ps1 <python.py>"
     exit 1
 }
 
-# pip update
-LogMessage "Updating PIP..."
-& $python_venv -m pip install --upgrade pip
-$status = $LASTEXITCODE
-if ($status -eq 0){
-    LogMessage "PIP update successfully done"
-}
-else {
-    LogMessage "Error !!! Fail to update PIP"
-}
+# Get Application file path
+$application = $args[0]
 
-# install dependances
-LogMessage "Python dependances installation"
-if (!(Test-Path -Path $CONF_DIR\requirements.txt -PathType Leaf)){
-    LogMessage "No requirement.txt file found. Only Jupyter will be installed"
-}
-else {
-    & $python_venv -m pip install -r $CONF_DIR\requirements.txt
-    $status = $LASTEXITCODE
-    if ($status -eq 0){
-        LogMessage "Python dependances successully installed"
-    }
-    else {
-        LogMessage "Error !!! Fail to install Python dependances"
-        exit 1
-    }
-}
-
-# testing
-LogMessage "Checking..."
-$jupyter = Join-Path $VENV_PYTHON_DIR "Scripts\jupyter.exe"
-if ((Test-Path -Path $jupyter -PathType Leaf)){
-    & $jupyter --version
-    $status = $LASTEXITCODE
-    if ($status -eq 0){
-        LogMessage "Jupyter successfully installed"
-        LogMessage "Python virtual env is ready!"
-    }
-    else {
-        LogMessage "Error !!! Jupyter fail to be installed"
-    }
-}
-else {
-    LogMessage "Error !!! Jupyter exec not found"
+# Checking Application file exists
+#$ApplicationPath = [string]"$APP_DIR\$Application"
+$applicationPath = Join-Path $APP_DIR $application
+if (-not (Test-Path -Path $applicationPath -PathType Leaf)) {
+    LogMessage "Error !!! Application file is missing : $applicationPath"
     exit 1
 }
+
+# Executing Application
+LogMessage "Executing application : $applicationPath"
+#$python_venv = "{0}\{1}" -f $VENV_PYTHON_DIR, "Scripts\python.exe"
+# & $python_venv $applicationPath
+& $python $applicationPath
+
 LogMessage ""
 LogMessage "# === END OF PROCESS === #"
 LogMessage ""

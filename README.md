@@ -32,6 +32,7 @@ EssencePy/
 ├── scripts/        # Core executable scripts
 │ ├── shell/        # Scripts for Linux OS
 │ └── powershell/   # Scripts for Windows OS
+├── RELEASE.md      # Follow updates
 └── README.md
 ```
 
