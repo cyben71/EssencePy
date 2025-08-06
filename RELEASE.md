@@ -1,15 +1,16 @@
 # EssencePy releases
 
-## Version 1.0.1 (YYYY-MM-DD)
+## Version 2.0.0 (2025-08-06)
 
 ### Releases - Description
 Add a bootstrap and python context mecanisms 
 
 ```textile
 1) Upgrade 'README.md'
-2) Add 'RELEASES.md' file
+2) Add 'RELEASES.md' files       # follow updates 
 3) Under './lib/':
     + Add 'bootstrap' subdirectory
+    + Add 'my_dummy_class.py'    # for testing a new class outside of bootstrap
 4) Under './lib/bootstrap/' directory
     + Add file 'bootstrap.py'    # contains methods and functions to create and load a Python context
     + Add file 'context.py'      # defines context

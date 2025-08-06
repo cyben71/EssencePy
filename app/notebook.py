@@ -4,7 +4,7 @@
 # In[1]:
 
 
-APPLICATION_NAME = "DEMO_LoggerClass"
+APPLICATION_NAME = "Notebook"
 
 
 # In[2]:
@@ -32,36 +32,40 @@ from lib.bootstrap.bootstrap import init_env
 epy = init_env()
 
 
-# ## Testing log functions
+# ## Methods and functions from class: AppEnv
 
 # In[3]:
 
 
-epy.log.info(f"Testing INFO message : {epy.appenv.get_current_date()} {epy.appenv.get_current_time()}")
+print(epy.appenv.get_current_date())
+print(epy.appenv.get_hostname())
 
 
 # In[4]:
 
 
-epy.log.warning(f"Testing WARNING message : {epy.appenv.get_current_date()} {epy.appenv.get_current_time()}")
+print(epy.appenv.get_system())
 
 
-# In[5]:
-
-
-epy.log.error(f"Testing ERROR message : {epy.appenv.get_current_date()} {epy.appenv.get_current_time()}")
-
-
-# ## Testing other functions
+# ## Using your own class (outside of bootstrap)
 
 # In[6]:
 
 
-epy.log.get_log_file
+# load your class
+from lib.my_dummy_class import Dummy
 
 
 # In[7]:
 
 
-epy.log.get_log_folder
+# instanciate with required arguments
+cls = Dummy(epy)
+
+
+# In[8]:
+
+
+# use your class
+cls.dummy_function()
 

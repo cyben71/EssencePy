@@ -15,7 +15,8 @@ class AppEnv:
     #def __init__(self, app_home: str, app_name: str):
     def __init__(self):
 
-        """Constructor
+        """
+        Constructor
         """
         
         # instance variables (hidden for more clarety in IDE)

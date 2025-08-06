@@ -73,7 +73,6 @@ def load_all(epy: Context, app_home: Path , app_name: str) -> None:
             print(f"[load_all] - Error on instanciating of {cls.__name__}: {e}")
 
 
-
 def summarize_context() -> None:
     """
     Summurizing content of context
@@ -103,27 +102,26 @@ def summarize_context() -> None:
 
     separator = "─" * 50
     print()
-    print(color("🔧 Application Context Initialized", "96"))  # cyan clair
+    print(color("🔧  Application Context Initialized", "96"))  # cyan clair
     print(color(separator, "90"))  # gris
 
-    print(f"{color('🖥️ SYSTEM', '91')} : {platform.system()} ({platform.platform()})")
-    print(f"{color('🐍 PYTHON_VERSION', '92')} : {python_version}")
-    print(f"{color('🧪 INTERPRETER_PATH', '92')} : {interpreter_path}")
-    print(f"{color('📦 ENVIRONMENT', '92')} : {venv_info}")
-    print(f"{color('📦 EPY_MODULES', '92')} : {', '.join(sorted(module_names)) or 'None'}")
+    print(f"{color('🖥️  SYSTEM', '91')} : {platform.system()} ({platform.platform()})")
+    print(f"{color('🐍  PYTHON_VERSION', '92')} : {python_version}")
+    print(f"{color('🧪  INTERPRETER_PATH', '92')} : {interpreter_path}")
+    print(f"{color('📦  ENVIRONMENT', '92')} : {venv_info}")
+    print(f"{color('📦  EPY_MODULES', '92')} : {', '.join(sorted(module_names)) or 'None'}")
 
-    print(f"{color('📁 APPLICATION_HOME', '93')} : {context.APPLICATION_HOME}")
-    print(f"{color('📛 APPLICATION_NAME', '93')} : {context.APPLICATION_NAME}")
-    #print(f"{color('🐍 PYTHON_VERSION',   '93')} : {platform.python_version()}")
+    print(f"{color('📁  APPLICATION_HOME', '93')} : {context.APPLICATION_HOME}")
+    print(f"{color('📛  APPLICATION_NAME', '93')} : {context.APPLICATION_NAME}")
 
     # Config files dynamically loaded in context
     if hasattr(context, 'CFGENV_FILE'):
-        print(f"📘 ENV file loaded : {context.CFGENV_FILE}")
+        print(f"📘  ENV file loaded : {context.CFGENV_FILE}")
     if hasattr(context, 'CFGPROPS_FILE'):
-        print(f"📘 PROPERTIES file loaded : {context.CFGPROPS_FILE}")
+        print(f"📘  PROPERTIES file loaded : {context.CFGPROPS_FILE}")
     if hasattr(context, 'CFGYAML_FILE'):
-        print(f"📘 YAML file loaded : {context.CFGYAML_FILE}")
+        print(f"📘  YAML file loaded : {context.CFGYAML_FILE}")
     
     print()
-    print(color("✅ Context is ready.", "92"))  # vert
+    print(color("✅  Context is ready.", "92"))  # vert
     print(color(separator, "90"))
