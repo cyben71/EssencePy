@@ -1,1 +1,1 @@
-jupyter     # need for convert noteboook to python
+jupyter == 1.1.1     # need for convert noteboook to python

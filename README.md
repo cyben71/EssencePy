@@ -24,13 +24,15 @@ It brings together reusable utilities, structured code organization, and cross-p
 EssencePy/ 
 ├── app/            # Python applications folder
 ├── config/         # Configuration files (.yaml, .properties, etc.) 
-├── lib/            # Core Python libraries 
-│ └── init/         # Autoloaded classes (e.g., ConfigLoader, AppEnv, etc.) 
+├── lib/            # Core Python libraries
+│ ├── bootstrap/    # Autoloaded main classes (e.g., bootstrap, init_code, AppEnv, ConfigYaml... etc.)
+│ └── init/         # Others external classes
 ├── logs/           # Application logs  (folder automatically created if not existing)
 ├── notebooks/      # Jupyter notebooks for development or analysis 
 ├── scripts/        # Core executable scripts
 │ ├── shell/        # Scripts for Linux OS
 │ └── powershell/   # Scripts for Windows OS
+├── RELEASE.md      # Follow updates
 └── README.md
 ```
 
@@ -71,10 +73,20 @@ cd <APPLICATION_HOME>/scripts/powershell>
 ## 💡 Some use cases
 ```md
 > Tip: I want to use my own Python lib. 
-
-Put your Python lib in "lib/init/" folder. 
-Your lib should be loaded automatically after restarting Jupyter kernel or when launching Python program (for example)
+Put your Python lib in "lib/" folder, then :
 ```
+```python
+# import your class
+from lib.my_class import MyClass
+
+# instanciate
+my_cls = MyClass(**kargs)
+
+# using
+foo = my_cls.function()
+```
+
+
 
 ```md
 > Tip: I already have a Python program.
@@ -91,7 +103,7 @@ By default with value like: "rt/python/bin/python3"
 ```
 ### Currently working with
 - Windows 10    | Powershell 5.1    | Python 3.12.8
-- Centos 7      | Bash 4.2.46       | Python 3.9.21
+- Centos 7      | Bash 4.2.46       | Python 3.11.11
 - MacOS 15      | Zsh 5.9           | Python 3.12 (installed by brew)
 
 ---
