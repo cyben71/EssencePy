@@ -52,10 +52,10 @@ Feel free to fork, extend, and adapt EssencePy to your own workflows 💡
 ## 🛠️ How to use EssencePy
 1. First of all, clone the project 😉
 2. Edit `conf/env.conf` file and **setup** location for Python binaries in **PARENT_PYTHON_HOME** (for Linux) or **WIN_PARENT_PYTHON_HOME** (for Windows)
-3. Fulfill `conf/requirements.txt` file to add your required Python libs to project
-4. Launch the required script `project-init` (with correct extension for your system)
+3. Fulfill `conf/requirements.txt` file to add your required Python packages to your project
+4. Launch the script `project-init` (with correct extension for your system)
 
-This setup and script will create a **Python virtual environment**, loads dependencies and enables Jupyter (which can be used in your IDE, converting notebook...etc ). 
+This last action will create a **Python virtual environment**, loads dependencies (from requirements) and enables Jupyter (which can be used in your IDE, converting notebook...etc ). 
 
 ### Main functions
 ```shell
@@ -65,7 +65,7 @@ cd <APPLICATION_HOME>/scripts/powershell
 .\notebook-converter.ps1 myNotebook.ipynb
 ```
 ```shell
-# Launching my Python program (example with a Windows OS)
+# Launching my Python program manually (example with a Windows OS)
 # Program is called myNotebook.py and stored in "app" folder 
 cd <APPLICATION_HOME>/scripts/powershell>
 .\app-start.ps1 myNotebook.py
@@ -73,19 +73,15 @@ cd <APPLICATION_HOME>/scripts/powershell>
 ## 💡 Some use cases
 ```md
 > Tip: I want to use my own Python lib. 
-Put your Python lib in "lib/" folder, then :
+
+Put your Python lib in "lib/" folder, then:
+
+# instanciate your class and use it
+my_cls = epy.load_cls(module_name='my_class_file', class_name='MyClass', args=[*args])
+
+foo = my_class.function()
+
 ```
-```python
-# import your class
-from lib.my_class import MyClass
-
-# instanciate
-my_cls = MyClass(**kargs)
-
-# using
-foo = my_cls.function()
-```
-
 
 
 ```md

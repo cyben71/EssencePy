@@ -1,4 +1,4 @@
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 from pathlib import Path
 import sys, os
@@ -18,6 +18,7 @@ def init_env() -> Context:
     """
     bootstrap()
     init_code.summarize_context()
+    
     return epy
 
 def bootstrap() -> Context:
@@ -46,7 +47,10 @@ def bootstrap() -> Context:
 
     # Load all modules from lib/bootstrap
     init_code.init()
-    init_code.load_all(epy, app_home, app_name)
+    init_code.load_epy_cls(epy, app_home, app_name)
+
+    # Expose a specific function to epy context
+    epy.load_class = init_code.load_class
         
     return epy
 

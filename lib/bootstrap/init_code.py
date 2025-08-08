@@ -1,9 +1,10 @@
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 import importlib.util
 import inspect
 import platform
 import sys
+import os
 from pathlib import Path
 from lib.bootstrap.context import context, Context
 from lib.bootstrap import cfgyaml
@@ -21,7 +22,7 @@ def init() -> None:
 
 # load classes included in /lib/bootstrap
 # safe version. introspection of class arguments
-def load_all(epy: Context, app_home: Path , app_name: str) -> None:
+def load_epy_cls(epy: Context, app_home: Path , app_name: str) -> None:
     init_dir = Path(app_home) / "lib/bootstrap"
 
     for file in init_dir.glob("*.py"):
@@ -31,14 +32,14 @@ def load_all(epy: Context, app_home: Path , app_name: str) -> None:
         module_name = f"lib.bootstrap.{file.stem}"
         spec = importlib.util.spec_from_file_location(module_name, file)
         if not spec or not spec.loader:
-            print(f"[load_all] - No specs found for {file.name}")
+            print(f"[load_epy_cls] - No specs found for {file.name}")
             continue
 
         try:
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
         except Exception as e:
-            print(f"[load_all] - Error on loading module {module_name}: {e}")
+            print(f"[load_epy_cls] - Error on loading module {module_name}: {e}")
             continue
 
         # Nom de classe par défaut : CamelCase du nom du fichier
@@ -54,7 +55,7 @@ def load_all(epy: Context, app_home: Path , app_name: str) -> None:
                     break
 
         if cls is None:
-            print(f"[load_all] - No class found in {file.name}")
+            print(f"[load_epy_cls] - No class found in {file.name}")
             continue
 
         # Instanciation sécurisée si possible
@@ -66,11 +67,60 @@ def load_all(epy: Context, app_home: Path , app_name: str) -> None:
                 alias = getattr(cls, 'alias', file.stem)
                 setattr(epy, alias, instance)
             #else:
-            #    print(f"[load_all] Classe {cls.__name__} ne supporte pas app_home/app_name")
+            #    print(f"[load_epy_cls] Classe {cls.__name__} ne supporte pas app_home/app_name")
         except (ValueError, TypeError):
-            print(f"[load_all] - Class {cls.__name__} can not be introspected (built-in ?)")
+            print(f"[load_epy_cls] - Class {cls.__name__} can not be introspected (built-in ?)")
         except Exception as e:
-            print(f"[load_all] - Error on instanciating of {cls.__name__}: {e}")
+            print(f"[load_epy_cls] - Error on instanciating of {cls.__name__}: {e}")
+
+
+def load_class(module_name: str, class_name: str = None, args: list = []):
+    """
+    Allow to load and instanciate your own python class (outside of lib/bootstrap)
+    Args:
+        module_name (str): Module name (without extension) to load. Ex: module_name = 'my_dummy_class'
+        class_name (str, optional): Class name to load. Defaults to None.
+        args (list, optional): List of arguments required by module. Defaults to [].
+    Returns:
+        cls (object): a properly loaded module with its class
+    """
+    # if not module_name and not class_name:
+    #     raise ValueError("Au moins 'module_name' ou 'class_name' doit être fourni.")
+
+    # Add lib to python context if not exists
+    lib_path = Path(context.APPLICATION_HOME) / "lib"
+    if lib_path not in sys.path:
+        sys.path.insert(0, lib_path)
+
+    # using importlib.util to loading from absolute path
+    module_path = os.path.join(lib_path, f"{module_name}.py")
+    if not os.path.exists(module_path):
+        raise FileNotFoundError(f"Module file not found: {module_path}")
+
+    try:
+        spec = importlib.util.spec_from_file_location(module_name, module_path)
+        if not spec or not spec.loader:
+            raise ImportError(f"Spec for '{module_name}' can not be created")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+    except Exception as e:
+        raise ImportError(f"Module '{module_name}' can not be loaded - {e}")
+
+    # Looking for class
+    if class_name:
+        cls = getattr(mod, class_name, None)
+        if cls is None:
+            raise AttributeError(f"Class '{class_name}' is not found in '{module_name}' module")
+    else:
+        classes = [obj for name, obj in inspect.getmembers(mod, inspect.isclass) if obj.__module__ == mod.__name__]
+        if len(classes) == 1:
+            cls = classes[0]
+        elif len(classes) == 0:
+            raise ValueError(f"No class found in module '{module_name}'")
+        else:
+            raise ValueError(f"More than one class found in '{module_name}'. Use 'class_name'.")
+
+    return cls(*args)
 
 
 def summarize_context() -> None:

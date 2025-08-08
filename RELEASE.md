@@ -1,5 +1,23 @@
 # EssencePy releases
 
+## Version 2.0.1 (2025-08-XX)
+
+### Releases - Description
+Add function to load your own class more easily. Function is directly available in epy context
+
+```textile
+1) Upgrade 'README.md' and 'RELEASE.md'
+2) Under './lib/bootstrap/' directory:
+   + Add function 'load_cls' in 'init_code.py'
+   + Declare function 'load_cls' in 'bootstrap.py'
+   + Declare function signature 'context.py'
+3) Under './lib' directory:
+   + Add file 'my_dummy_class.py' for example
+4) Under './notebooks' and ./app:
+   > Update notebook and program with and example of this new function
+
+```
+
 ## Version 2.0.0 (2025-08-06)
 
 ### Releases - Description
