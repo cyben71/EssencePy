@@ -23,10 +23,9 @@ It brings together reusable utilities, structured code organization, and cross-p
 ```shell
 EssencePy/ 
 ├── app/            # Python applications folder
-├── config/         # Configuration files (.yaml, .properties, etc.) 
+├── conf/         # Configuration files (.yaml, .properties, etc.) 
 ├── lib/            # Core Python libraries
-│ ├── bootstrap/    # Autoloaded main classes (e.g., bootstrap, init_code, AppEnv, ConfigYaml... etc.)
-│ └── init/         # Others external classes
+│ └── bootstrap/    # Autoloaded main classes (e.g., bootstrap, init_code, AppEnv, ConfigYaml... etc.)
 ├── logs/           # Application logs  (folder automatically created if not existing)
 ├── notebooks/      # Jupyter notebooks for development or analysis 
 ├── scripts/        # Core executable scripts
@@ -55,7 +54,9 @@ Feel free to fork, extend, and adapt EssencePy to your own workflows 💡
 3. Fulfill `conf/requirements.txt` file to add your required Python packages used by your project
 4. Launch the script `venv-create` (with correct extension for your system)
 
-This last action will create a **Python virtual environment**, loads dependencies (from requirements file). 
+This last action will create a **Python virtual environment** and load your required python packages. 
+
+If you want to dev with notebooks, you have to deploy 'Jupyter' package into your Python parent folder or into your virtual env. (with the requirements script for example).
 
 ### Main functions
 ```shell
