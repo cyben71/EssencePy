@@ -1,25 +1,16 @@
 <#
     .SYNOPSIS
-    Convert a Jupyter notebook to Python program
+    Install Python packages (dependencies)
 
     .DESCRIPTION
-    Convert a Jupyter notebook file to a Python program. Python program is automatically stored in 'app/' folder
-
-    .PARAMETER <notebook_filename>
-    Name of Notebook file stored in 'notebooks/' folder
-
-    .PARAMETER <notebook_extension>
-    Jupyter notebook extension is: '.ipynb'
+    Allow to load Python packages (dependencies) listed 'conf/requirements.txt' and needed by your project manually. 
+    This script can be used without Python virtualenv.
 
     .INPUTS
-    Python package 'jupyter' must be installed and available
-
+    List of Python packages stored in 'conf/requirements.txt'
+    
     .OUTPUTS
-    Python program file saved in 'app/' folder
-
-    .EXAMPLE
-    ./scripts/powershell/notebook-converter.ps1 notebook.ipynb
-
+    All Python packages are download and stored in user home. 
 #>
 
 #################
@@ -60,15 +51,13 @@ $CONF_DIR = Join-Path $env:APPLICATION_HOME "conf"
 $CONF_FILE = Join-Path $CONF_DIR "env.conf"
 $LOG_DIR = Join-Path $env:APPLICATION_HOME "log"
 $CUR_DATE = $timestamp = Get-Date -Format "yyyy-MM-dd"
-$LOG_FILE = Join-Path $LOG_DIR "win_convert_$CUR_DATE.log"
-$NOTEBOOK_DIR = Join-Path $env:APPLICATION_HOME "Notebooks"
-$APP_DIR = Join-Path $env:APPLICATION_HOME "app"
+$LOG_FILE = Join-Path $LOG_DIR "win_requirements_$CUR_DATE.log"
 
 # ------------------------------------------------------------------------ #
 
-LogMessage "# =========================== #"
-LogMessage "# === CONVERTING NOTEBOOK === #"
-LogMessage "# =========================== #"
+LogMessage "# =============================== #"
+LogMessage "# === INSTALLING REQUIREMENTS === #"
+LogMessage "# =============================== #"
 LogMessage ""
 
 # create log folder if not exists and log file
@@ -123,13 +112,15 @@ $python_venv = Join-path -Path "$VENV_PYTHON_DIR\Scripts" $VENV_PYTHON_EXE
 # Initialisation
 $python = $null
 
-LogMessage "------------------------------------------------------"
-LogMessage "---- Converting Jupyter notebook to Python program ---"
-LogMessage "------------------------------------------------------"
+LogMessage "-------------------------------------"
+LogMessage "--- Deploying Python dependencies ---"
+LogMessage "-------------------------------------"
 
 # checking virtual python exists
+# use case: if no venv, dependences must be installed with 'user mode' (pip install --user)
+# use case: if venv, dependences can be installed without 'user mode' (pip install). venv will isolate packages
 if (-not (Test-Path -Path $python_venv -PathType Leaf)) {
-    LogMessage "Virtual python not found in : $python_venv"
+    LogMessage "Virtual python not found in : $env:APPLICATION_HOME"
 
     # checking Python parent
     if (-not (Test-Path -Path $python_parent -PathType Leaf)) {
@@ -140,73 +131,54 @@ if (-not (Test-Path -Path $python_venv -PathType Leaf)) {
         LogMessage "Python parent found : $python_parent"
         $python_folder = $PARENT_PYTHON_HOME
         $python = $python_parent
+        $pip_install_opts = "--user"
     }
 } else {
     LogMessage "Virtual python environment detected : $python_venv"
     $python_folder = $VENV_PYTHON_DIR
     $python = $python_venv
+    $pip_install_opts = ""
 }
 LogMessage
 
-
-# Checking argument for execution
-if ($args.Count -lt 1) {
-    LogMessage "Error !!! Usage: .\notebook-converter.ps1 <notebook.ipynb>"
-    exit 1
-}
-
-# Get notebook file path
-$Notebook = $args[0]
-
-# Checking notebook file exists in 
-$NotebookPath = Join-Path $NOTEBOOK_DIR $Notebook
-if (-not (Test-Path -Path $NotebookPath -PathType Leaf)) {
-    LogMessage "Error !!! Notebook file to convert is missing : $NotebookPath"
-    exit 1
-}
-LogMessage "Notebook to convert : $NotebookPath"
-
-# create APP_DIR if not exists
-if (-not (Test-Path -Path $APP_DIR -PathType Container)) {
-    New-Item -ItemType Directory -Path $APP_DIR | Out-Null
-}
-
-# Checking Jupyter package is available
-LogMessage "Checking if Jupyter package is available..."
-$jupyter = Join-Path $python_folder "Scripts\jupyter.exe"
-
-if ((Test-Path -Path $jupyter -PathType Leaf)){
-    & $jupyter --version
-    $status = $LASTEXITCODE
-    if ($status -eq 0){
-        LogMessage "Jupyter package is available"
-    }
-    else {
-        LogMessage "Error !!! Jupyter package is not available"
-        LogMessage ""
-        exit 1
-    }
+# install dependencies
+LogMessage "Python dependencies installation"
+if (!(Test-Path -Path $CONF_DIR\requirements.txt -PathType Leaf)){
+    LogMessage "No requirement.txt file found"
 }
 else {
-    LogMessage "Error !!! Jupyter exec not found"
-    LogMessage ""
+    & $python -m pip install $pip_install_opts -r $CONF_DIR\requirements.txt
+    $status = $LASTEXITCODE
+}
+
+# checking result of installation
+if ($status -eq 0){
+    LogMessage "Python dependencies successfully installed"
+}
+else {
+    LogMessage "Error !!! Fail to install Python dependencies"
     exit 1
 }
 
-# Converting notebook
-LogMessage "Converting notebook..."
-& $python -m jupyter nbconvert "$NotebookPath" --to script --output-dir "$APP_DIR"
+# # testing
+# LogMessage "Checking Jupyter..."
+# $jupyter = Join-Path $VENV_PYTHON_DIR "Scripts\jupyter.exe"
+# if ((Test-Path -Path $jupyter -PathType Leaf)){
+#     & $jupyter --version
+#     $status = $LASTEXITCODE
+#     if ($status -eq 0){
+#         LogMessage "Jupyter successfully installed"
+#         LogMessage "Python virtual env is ready!"
+#     }
+#     else {
+#         LogMessage "Error !!! Jupyter fail to be installed"
+#     }
+# }
+# else {
+#     LogMessage "Error !!! Jupyter exec not found"
+#     exit 1
+# }
 
-# Checking converting
-$notebookName = [System.IO.Path]::GetFileNameWithoutExtension($NotebookPath)
-$convertedFile = Join-Path $APP_DIR "$notebookName.py"
-
-if (Test-Path -Path $convertedFile -PathType Leaf) {
-    LogMessage "Notebook successfully converted to python. File available : $convertedFile"
-} else {
-    LogMessage "Error !!! Notebook converting failed. $notebookName.py not found in: $APP_DIR"
-    exit 1
-}
 LogMessage ""
 LogMessage "# === END OF PROCESS === #"
 LogMessage ""

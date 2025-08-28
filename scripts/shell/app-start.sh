@@ -1,7 +1,9 @@
 #!/bin/bash
 
-# USAGES:
-# $ ./bin/app-start.sh ${PYTHON_APP.py}
+# description:  Allow to execute Python program stored in 'app/' folder
+# version:      2.1.0
+# usage:		./scripts/shell/app-start.sh ${PYTHON_APP.py}
+
 
 set -e  # Stop the script on error
 
@@ -41,9 +43,12 @@ fi
 CONF_DIR="${APPLICATION_HOME}/conf"
 APP_DIR="${APPLICATION_HOME}/app"
 
-# Logs
-LOG_FILE="${APPLICATION_HOME}/log/start.log"
+# Setting logging folder and file
+CURRENT_DATE="$(date '+%Y-%m-%d')"
+LOG_FILE="${APPLICATION_HOME}/log/start_app_${CURRENT_DATE}.log"
 mkdir -p "$(dirname "${LOG_FILE}")"
+
+# ------------------------------------------------------------------------ #
 
 log_message "# ============================= #"
 log_message "# === STARTING APPLICATION ==== #"
@@ -79,6 +84,12 @@ log_message "VENV_PYTHON_EXE : ${PARENT_PYTHON_EXE}"
 # ======================================================================== #
 # ======================================================================== #
 
+log_message ""
+log_message "--------------------------------"
+log_message "--- Executing Python program ---"
+log_message "--------------------------------"
+log_message ""
+
 # Search for Python exec
 if [ -d "${VENV_PYTHON_DIR}" ] && [ -x "${VENV_PYTHON_DIR}/bin/${VENV_PYTHON_EXE}" ]; then
     VENV_PYTHON="${VENV_PYTHON_DIR}/bin/${VENV_PYTHON_EXE}"
@@ -95,6 +106,7 @@ if [ -z "$1" ]; then
     log_message "Using : $0 <nom_du_python.py>"
     exit 1
 fi
+log_message ""
 
 APP_NAME="$1"
 APP_PATH="${APP_DIR}/${APP_NAME}"

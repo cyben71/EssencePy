@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[8]:
 
 
 APPLICATION_NAME = "Notebook"
 
 
-# In[1]:
+# In[9]:
 
 
 import sys
@@ -34,14 +34,14 @@ epy = init_env()
 
 # ## Methods and functions from class: AppEnv
 
-# In[2]:
+# In[10]:
 
 
 print(epy.appenv.get_current_date())
 print(epy.appenv.get_hostname())
 
 
-# In[3]:
+# In[11]:
 
 
 print(epy.appenv.get_system())
@@ -49,19 +49,19 @@ print(epy.appenv.get_system())
 
 # ## Using your own class (outside of bootstrap)
 
-# In[5]:
+# In[12]:
 
 
 cls = epy.load_class(module_name='my_dummy_class', args=[epy, APPLICATION_NAME])
 
 
-# In[ ]:
+# In[13]:
 
 
 cls.dummy_function()
 
 
-# In[ ]:
+# In[14]:
 
 
 cls.app_name

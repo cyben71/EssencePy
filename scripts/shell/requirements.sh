@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# description:  Convert a Jupyter notebook file to a Python program. Python program is automatically stored in 'app/' folder
+# description:  Allow to load Python packages (dependencies) listed 'conf/requirements.txt' and needed by your project manually. This script can be used without Python virtualenv.
 # version:      2.1.0
-# usage:		./scripts/shell/notebook-converter.sh ${NOTEBOOK_NAME.ipynb}
+# usage:		./scripts/shell/requirements.sh
 
 set -e  # Stop the script on error
 
@@ -34,29 +34,27 @@ done
 
 # Checking
 if [ -z "${APPLICATION_HOME:-}" ]; then
-    echo "❌  Error : Fail to find bootstrap.py"
+    echo "❌  Error : Fail to find init_code.py"
     exit 1
 fi
 
-CONF_DIR="${APPLICATION_HOME}/conf"
-SRC_DIR="${APPLICATION_HOME}/notebooks"
-APP_DIR="${APPLICATION_HOME}/app"
-
 # Setting logging folder and file
 CURRENT_DATE="$(date '+%Y-%m-%d')"
-LOG_FILE="${APPLICATION_HOME}/log/convert_${CURRENT_DATE}.log"
+CONF_DIR="${APPLICATION_HOME}/conf"
+LOG_FILE="${APPLICATION_HOME}/log/requirements_${CURRENT_DATE}.log"
 mkdir -p "$(dirname "${LOG_FILE}")"
 
 # ------------------------------------------------------------------------ #
 
-log_message "# ============================ #"
-log_message "# === CONVERTING NOTEBOOK ==== #"
-log_message "# ============================ #"
+log_message "# =============================== #"
+log_message "# === INSTALLING REQUIREMENTS === #"
+log_message "# =============================== #"
 log_message ""
 
-# Chargement env.conf
-if [ -f ${CONF_DIR}/env.conf ]; then
-    . ${CONF_DIR}/env.conf
+# Chargement du fichier env.conf
+if [ -f "${CONF_DIR}/env.conf" ]; then
+    source "${CONF_DIR}/env.conf"
+    log_message "Config file location is : ${CONF_DIR}/env.conf"
 else
     log_message "❌  Error : Config file '${CONF_DIR}/env.conf' not found."
     exit 1
@@ -75,62 +73,60 @@ log_message "VENV_PYTHON_EXE : ${PARENT_PYTHON_EXE}"
 # ======================================================================== #
 # ======================================================================== #
 
+# Checking Python exec
+if ! command -v ${PARENT_PYTHON_HOME}/bin/${PARENT_PYTHON_EXE} &> /dev/null; then
+    log_message "❌  Python program not found in: (${PARENT_PYTHON_HOME}/bin/${PARENT_PYTHON_EXE})."
+    exit 1
+fi
 log_message ""
-log_message "-----------------------------------------------------"
-log_message "--- Converting Jupyter notebook to Python program ---"
-log_message "-----------------------------------------------------"
+log_message "--------------------------------------"
+log_message "---- Deploying Python dependencies ---"
+log_message "--------------------------------------"
 log_message ""
 
-# Search for Python exec
+# Search for Python exec and set Pip options for installing packages
+# use case: if no venv, dependences must be installed with 'user mode' (pip install --user)
+# use case: if venv, dependences can be installed without 'user mode' (pip install). venv will isolate packages
 if [ -d "${VENV_PYTHON_DIR}" ] && [ -x "${VENV_PYTHON_DIR}/bin/${VENV_PYTHON_EXE}" ]; then
     VENV_PYTHON="${VENV_PYTHON_DIR}/bin/${VENV_PYTHON_EXE}"
     log_message "🟢  Virtual environment found. Using : ${VENV_PYTHON}"
     PYTHON_EXE="${VENV_PYTHON}"
+    PYTHON_FOLDER=$"${VENV_PYTHON_DIR}"
+    PIP_OPTS=""
 else
     log_message "⚪️  No virtual environment found. Using : ${PARENT_PYTHON_HOME}/bin/${PARENT_PYTHON_EXE}"
     PYTHON_EXE="${PARENT_PYTHON_HOME}/bin/${PARENT_PYTHON_EXE}"
+    PYTHON_FOLDER=$"${PARENT_PYTHON_HOME}"
+    PIP_OPTS="--user"
 fi
 log_message ""
 
-# Checking argument for execution
-if [ -z "$1" ]; then
-    log_message "❌  Error : You have to provide a program name for launching."
-    log_message "Using : $0 <nom_du_python.py>"
-    exit 1
-fi
-
-NOTEBOOK_NAME="$1"
-NOTEBOOK_PATH="${SRC_DIR}/${NOTEBOOK_NAME}"
-
-# Checking notebook exists
-if [ ! -f "${NOTEBOOK_PATH}" ]; then
-    log_message "❌  Error : Notebook '${NOTEBOOK_NAME}' is not found in '${SRC_DIR}'."
-    exit 1
-fi
-
-# Checking Jupyter package exists
-# if ! jupyter --version &> /dev/null; then
-if ! ${PYTHON_EXE} -m jupyter --version &> /dev/null; then
-    log_message "❌  Error : Jupyter package is not available"
-    exit 1
+# Installation of Jupyter and dependances
+if [ -f "${CONF_DIR}/requirements.txt" ]; then
+    log_message "📦  Python dependencies installation..."
+    ${PYTHON_FOLDER}/bin/pip install ${PIP_OPTS} -r "${CONF_DIR}/requirements.txt"
 else
-    log_message "✅  Jupyter package is available"
-    log_message ""
+    log_message "🟠  No requirement.txt file found"
+    # ${VENV_PYTHON_DIR}/bin/pip install --user jupyter
 fi
 
-# Converting from notebook to python program
-log_message "Converting notebook : ${NOTEBOOK_NAME}"
-${PYTHON_EXE} -m jupyter nbconvert --to script "${NOTEBOOK_PATH}" --output-dir="${APP_DIR}"
-
-# Checking converting
+# Checking installation
 if [ $? -eq 0 ]; then
-    log_message "✅  Notebook ${NOTEBOOK_NAME} successfully converted"
-    #log_message ""
-    log_message "🎉  File available: ${APP_DIR}/${NOTEBOOK_NAME%.*}.py"
+    log_message "✅  Python dependencies successfully installed"
 else
-    log_message "❌  Fail to convert ${NOTEBOOK_NAME}"
+    log_message "❌ Fail to install Python dependencies"
     exit 1
 fi
+
+# # Test
+# if ! jupyter --version &> /dev/null; then
+#     log_message "❌  Error : Jupyter installation failed"
+#     exit 1
+# else
+#     log_message "✅  Jupyter installation successfully installed"
+# fi
+
+# log_message "🎉  Python virtual environment is ready !"
 
 log_message ""
 log_message "# === END OF PROCESS === #"

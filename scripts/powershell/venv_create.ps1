@@ -1,3 +1,20 @@
+<#
+    .SYNOPSIS
+    Intializing project
+
+    .DESCRIPTION
+    Create a Python virtualenv with dependencies stored to 'conf/requirements.txt'. Python package 'jupyter' is loaded by default to allow you to start to dev and run.
+
+    .INPUTS
+    List of Python packages stored in 'conf/requirements.txt'
+
+    .OUTPUTS
+    A new folder 'rt/' is created in this tree and contains all executables files for dev and run Python program
+
+    .EXAMPLE
+    ./scripts/powershell/venv_create.ps1
+#>
+
 #################
 ### FUNCTIONS ###
 #################
@@ -35,13 +52,14 @@ while ($true) {
 $CONF_DIR = Join-Path $env:APPLICATION_HOME "conf"
 $CONF_FILE = Join-Path $CONF_DIR "env.conf"
 $LOG_DIR = Join-Path $env:APPLICATION_HOME "log"
-$LOG_FILE = Join-Path $LOG_DIR "win_setup_env.log"
+$CUR_DATE = $timestamp = Get-Date -Format "yyyy-MM-dd"
+$LOG_FILE = Join-Path $LOG_DIR "win_setup_env_$CUR_DATE.log"
 
 # ------------------------------------------------------------------------ #
 
-LogMessage "# ============================= #"
-LogMessage "# === INITIALIZING PROJECT ===  #"
-LogMessage "# ============================= #"
+LogMessage "# ==================================== #"
+LogMessage "# === CREATING PYTHON VIRTUAL ENV ===  #"
+LogMessage "# ==================================== #"
 LogMessage ""
 
 # create log folder if not exists and log file
@@ -128,41 +146,47 @@ else {
     LogMessage "Error !!! Fail to update PIP"
 }
 
-# install dependances
-LogMessage "Python dependances installation"
+# install dependencies
+LogMessage "Python dependencies installation"
 if (!(Test-Path -Path $CONF_DIR\requirements.txt -PathType Leaf)){
-    LogMessage "No requirement.txt file found. Only Jupyter will be installed"
+    LogMessage "No requirement.txt file found"
 }
 else {
     & $python_venv -m pip install -r $CONF_DIR\requirements.txt
     $status = $LASTEXITCODE
-    if ($status -eq 0){
-        LogMessage "Python dependances successully installed"
-    }
-    else {
-        LogMessage "Error !!! Fail to install Python dependances"
-        exit 1
-    }
 }
 
-# testing
-LogMessage "Checking..."
-$jupyter = Join-Path $VENV_PYTHON_DIR "Scripts\jupyter.exe"
-if ((Test-Path -Path $jupyter -PathType Leaf)){
-    & $jupyter --version
-    $status = $LASTEXITCODE
-    if ($status -eq 0){
-        LogMessage "Jupyter successfully installed"
-        LogMessage "Python virtual env is ready!"
-    }
-    else {
-        LogMessage "Error !!! Jupyter fail to be installed"
-    }
+# checking result of installation
+if ($status -eq 0){
+    LogMessage "Python dependencies successully installed"
+    LogMessage ""
 }
 else {
-    LogMessage "Error !!! Jupyter exec not found"
+    LogMessage "Error !!! Fail to install Python dependencies"
     exit 1
 }
+
+# # testing
+# LogMessage "Checking Jupyter..."
+# $jupyter = Join-Path $VENV_PYTHON_DIR "Scripts\jupyter.exe"
+# if ((Test-Path -Path $jupyter -PathType Leaf)){
+#     & $jupyter --version
+#     $status = $LASTEXITCODE
+#     if ($status -eq 0){
+#         LogMessage "Jupyter successfully installed"
+#         LogMessage "Python virtual env is ready!"
+#     }
+#     else {
+#         LogMessage "Error !!! Jupyter fail to be installed"
+#     }
+# }
+# else {
+#     LogMessage "Error !!! Jupyter exec not found"
+#     exit 1
+# }
+
+LogMessage "Python virtual environment is ready !"
+
 LogMessage ""
 LogMessage "# === END OF PROCESS === #"
 LogMessage ""

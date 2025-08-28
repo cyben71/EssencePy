@@ -52,10 +52,10 @@ Feel free to fork, extend, and adapt EssencePy to your own workflows 💡
 ## 🛠️ How to use EssencePy
 1. First of all, clone the project 😉
 2. Edit `conf/env.conf` file and **setup** location for Python binaries in **PARENT_PYTHON_HOME** (for Linux) or **WIN_PARENT_PYTHON_HOME** (for Windows)
-3. Fulfill `conf/requirements.txt` file to add your required Python packages to your project
-4. Launch the script `project-init` (with correct extension for your system)
+3. Fulfill `conf/requirements.txt` file to add your required Python packages used by your project
+4. Launch the script `venv-create` (with correct extension for your system)
 
-This last action will create a **Python virtual environment**, loads dependencies (from requirements) and enables Jupyter (which can be used in your IDE, converting notebook...etc ). 
+This last action will create a **Python virtual environment**, loads dependencies (from requirements file). 
 
 ### Main functions
 ```shell
@@ -64,6 +64,7 @@ This last action will create a **Python virtual environment**, loads dependencie
 cd <APPLICATION_HOME>/scripts/powershell
 .\notebook-converter.ps1 myNotebook.ipynb
 ```
+
 ```shell
 # Launching my Python program manually (example with a Windows OS)
 # Program is called myNotebook.py and stored in "app" folder 
@@ -83,11 +84,10 @@ foo = my_class.function()
 
 ```
 
-
 ```md
 > Tip: I already have a Python program.
 
-Put your Python program in "app" folder and launch it with the required script
+Put your Python program in "app" folder and launch it with 'app-start' script
 ```
 
 ```md
@@ -97,10 +97,20 @@ VScode could be a little bit ennoying and can not detect your fresh Python virtu
 You have to set "python.defaultInterpreterPath" with your Python virtual env in VScode settings
 By default with value like: "rt/python/bin/python3"
 ```
+
+```md
+> Tip: Should I always use a Python virtualenv ?
+
+It is not necessary if you already have your required dependencies loaded in parent Python home or if you do not have need to isolate your program and packages. 
+
+However Python virtualenv is better for security reasons or professionnal workflow. You should use it without hesitate.
+```
 ### Currently working with
+
 - Windows 10    | Powershell 5.1    | Python 3.12.8
-- Centos 7      | Bash 4.2.46       | Python 3.11.11
+- ~~Centos 7      | Bash 4.2.46       | Python 3.11.11~~ (Centos7 is deprecated. I'm stopping tests on this OS)
 - MacOS 15      | Zsh 5.9           | Python 3.12 (installed by brew)
+- Ubuntu 24.04  | Bash 5.2.21       | Python 3.11.11
 
 ---
 Made with ❤️ for curious developers and pragmatic engineers.

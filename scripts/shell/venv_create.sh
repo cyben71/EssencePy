@@ -1,4 +1,9 @@
 #!/bin/bash
+
+# description:  Create a Python virtualenv with dependencies set in 'conf/requirements.txt'
+# version:      2.1.0
+# usage:		./scripts/shell/venv_create.sh
+
 set -e  # Stop the script on error
 
 #############
@@ -33,16 +38,17 @@ if [ -z "${APPLICATION_HOME:-}" ]; then
     exit 1
 fi
 
+# Setting logging folder and file
+CURRENT_DATE="$(date '+%Y-%m-%d')"
 CONF_DIR="${APPLICATION_HOME}/conf"
-
-LOG_FILE="${APPLICATION_HOME}/log/setup_env.log"
+LOG_FILE="${APPLICATION_HOME}/log/setup_env_${CURRENT_DATE}.log"
 mkdir -p "$(dirname "${LOG_FILE}")"
 
 # ------------------------------------------------------------------------ #
 
-log_message "# ============================= #"
-log_message "# === INITIALIZING PROJECT ==== #"
-log_message "# ============================= #"
+log_message "# ==================================== #"
+log_message "# === CREATING PYTHON VIRTUAL ENV ==== #"
+log_message "# ==================================== #"
 log_message ""
 
 # Chargement du fichier env.conf
@@ -72,10 +78,11 @@ if ! command -v ${PARENT_PYTHON_HOME}/bin/${PARENT_PYTHON_EXE} &> /dev/null; the
     log_message "❌  Python program not found in: (${PARENT_PYTHON_HOME}/bin/${PARENT_PYTHON_EXE})."
     exit 1
 fi
-
+log_message ""
 log_message "-----------------------------------------------"
 log_message "---- Creating of virtual python environment ---"
 log_message "-----------------------------------------------"
+log_message ""
 
 # Creating virtual env for Python
 log_message "🔧  Creating Python virtual env..."
@@ -86,24 +93,34 @@ source "${VENV_PYTHON_DIR}/bin/activate"
 
 # Pip updating
 log_message "🔄  Updating Pip..."
-pip install --upgrade pip
+${VENV_PYTHON_DIR}/bin/pip install --upgrade pip
 
-# Installation of Jupyter and dependances
+# Installing Python packages
 if [ -f "${CONF_DIR}/requirements.txt" ]; then
-    log_message "📦  Python dependences installation..."
-    pip install -r "${CONF_DIR}/requirements.txt"
+    log_message "📦  Python dependencies installation..."
+    ${VENV_PYTHON_DIR}/bin/pip install -r "${CONF_DIR}/requirements.txt"
 else
-    log_message "🟠  No requirement.txt file found. Only Jupyter will be installed"
-    pip install jupyter
+    log_message "🟠  No requirement.txt file found"
+    # ${VENV_PYTHON_DIR}/bin/pip install --user jupyter
 fi
 
-# Test
-if ! jupyter --version &> /dev/null; then
-    log_message "❌  Error : Jupyter installation failed"
-    exit 1
+# Checking converting
+if [ $? -eq 0 ]; then
+    log_message "✅  Python dependencies successfully installed"
+    log_message ""
+    # log_message "🎉  File available: ${APP_DIR}/${NOTEBOOK_NAME%.*}.py"
 else
-    log_message "✅  Jupyter installation successfully installed"
+    log_message "❌  Fail to install Python dependencies"
+    exit 1
 fi
+
+# # Test
+# if ! jupyter --version &> /dev/null; then
+#     log_message "❌  Error : Jupyter installation failed"
+#     exit 1
+# else
+#     log_message "✅  Jupyter installation successfully installed"
+# fi
 
 log_message "🎉  Python virtual environment is ready !"
 
