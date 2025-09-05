@@ -1,0 +1,23 @@
+2025-08-28 09:53:36 - # ============================ #
+2025-08-28 09:53:36 - # === CONVERTING NOTEBOOK ==== #
+2025-08-28 09:53:36 - # ============================ #
+2025-08-28 09:53:36 - 
+2025-08-28 09:53:36 - PARENT_PYTHON_HOME : /opt/python/3.11.11
+2025-08-28 09:53:37 - PARENT_PYTHON_EXE : python3
+2025-08-28 09:53:37 - VENV_PYTHON_DIR : /home/cyben71/EssencePy/rt
+2025-08-28 09:53:37 - VENV_PYTHON_EXE : python3
+2025-08-28 09:53:37 - 
+2025-08-28 09:53:37 - -----------------------------------------------------
+2025-08-28 09:53:37 - --- Converting Jupyter notebook to Python program ---
+2025-08-28 09:53:37 - -----------------------------------------------------
+2025-08-28 09:53:37 - 
+2025-08-28 09:53:37 - 🟢  Virtual environment found. Using : /home/cyben71/EssencePy/rt/bin/python3
+2025-08-28 09:53:37 - 
+2025-08-28 09:53:39 - ✅  Jupyter package is available
+2025-08-28 09:53:39 - 
+2025-08-28 09:53:39 - Converting notebook : notebook.ipynb
+2025-08-28 09:53:41 - ✅  Notebook notebook.ipynb successfully converted
+2025-08-28 09:53:41 - 🎉  File available: /home/cyben71/EssencePy/app/notebook.py
+2025-08-28 09:53:41 - 
+2025-08-28 09:53:41 - # === END OF PROCESS === #
+2025-08-28 09:53:41 - 

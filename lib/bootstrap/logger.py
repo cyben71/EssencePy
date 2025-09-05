@@ -42,6 +42,22 @@ class Logger:
         """
         return self._log_file
     
+    
+    def log(self, message: str) -> None:
+        """
+        Output a message in a log file without prefix and current date & timestamp
+        Args:
+            message (str): Message to output
+        Return:
+            None
+        """
+        try:
+            self._log(msg=message)
+        except Exception as err:
+            raise err
+        print(f"{AppEnv.get_current_date()} {AppEnv.get_current_time()} : {message}")
+
+
     def info(self, message: str) -> None:
         """
         Output a message in a log file with 'INFO' as prefix and current date & timestamp

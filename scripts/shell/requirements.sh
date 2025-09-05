@@ -1,4 +1,9 @@
 #!/bin/bash
+
+# description:  Allow to load Python packages (dependencies) listed 'conf/requirements.txt' and needed by your project manually. This script can be used without Python virtualenv.
+# version:      2.1.0
+# usage:		./scripts/shell/requirements.sh
+
 set -e  # Stop the script on error
 
 #############
@@ -33,16 +38,17 @@ if [ -z "${APPLICATION_HOME:-}" ]; then
     exit 1
 fi
 
+# Setting logging folder and file
+CURRENT_DATE="$(date '+%Y-%m-%d')"
 CONF_DIR="${APPLICATION_HOME}/conf"
-
-LOG_FILE="${APPLICATION_HOME}/log/setup_env.log"
+LOG_FILE="${APPLICATION_HOME}/log/requirements_${CURRENT_DATE}.log"
 mkdir -p "$(dirname "${LOG_FILE}")"
 
 # ------------------------------------------------------------------------ #
 
-log_message "# ============================= #"
-log_message "# === INITIALIZING PROJECT ==== #"
-log_message "# ============================= #"
+log_message "# =============================== #"
+log_message "# === INSTALLING REQUIREMENTS === #"
+log_message "# =============================== #"
 log_message ""
 
 # Chargement du fichier env.conf
@@ -72,40 +78,54 @@ if ! command -v ${PARENT_PYTHON_HOME}/bin/${PARENT_PYTHON_EXE} &> /dev/null; the
     log_message "❌  Python program not found in: (${PARENT_PYTHON_HOME}/bin/${PARENT_PYTHON_EXE})."
     exit 1
 fi
+log_message ""
+log_message "--------------------------------------"
+log_message "---- Deploying Python dependencies ---"
+log_message "--------------------------------------"
+log_message ""
 
-log_message "-----------------------------------------------"
-log_message "---- Creating of virtual python environment ---"
-log_message "-----------------------------------------------"
-
-# Creating virtual env for Python
-log_message "🔧  Creating Python virtual env..."
-${PARENT_PYTHON_HOME}/bin/${PARENT_PYTHON_EXE} -m venv ${VENV_PYTHON_DIR}
-
-# Enabling virtual env
-source "${VENV_PYTHON_DIR}/bin/activate"
-
-# Pip updating
-log_message "🔄  Updating Pip..."
-pip install --upgrade pip
+# Search for Python exec and set Pip options for installing packages
+# use case: if no venv, dependences must be installed with 'user mode' (pip install --user)
+# use case: if venv, dependences can be installed without 'user mode' (pip install). venv will isolate packages
+if [ -d "${VENV_PYTHON_DIR}" ] && [ -x "${VENV_PYTHON_DIR}/bin/${VENV_PYTHON_EXE}" ]; then
+    VENV_PYTHON="${VENV_PYTHON_DIR}/bin/${VENV_PYTHON_EXE}"
+    log_message "🟢  Virtual environment found. Using : ${VENV_PYTHON}"
+    PYTHON_EXE="${VENV_PYTHON}"
+    PYTHON_FOLDER=$"${VENV_PYTHON_DIR}"
+    PIP_OPTS=""
+else
+    log_message "⚪️  No virtual environment found. Using : ${PARENT_PYTHON_HOME}/bin/${PARENT_PYTHON_EXE}"
+    PYTHON_EXE="${PARENT_PYTHON_HOME}/bin/${PARENT_PYTHON_EXE}"
+    PYTHON_FOLDER=$"${PARENT_PYTHON_HOME}"
+    PIP_OPTS="--user"
+fi
+log_message ""
 
 # Installation of Jupyter and dependances
 if [ -f "${CONF_DIR}/requirements.txt" ]; then
-    log_message "📦  Python dependences installation..."
-    pip install -r "${CONF_DIR}/requirements.txt"
+    log_message "📦  Python dependencies installation..."
+    ${PYTHON_FOLDER}/bin/pip3 install ${PIP_OPTS} -r "${CONF_DIR}/requirements.txt"
 else
-    log_message "🟠  No requirement.txt file found. Only Jupyter will be installed"
-    pip install jupyter
+    log_message "🟠  No requirement.txt file found"
 fi
 
-# Test
-if ! jupyter --version &> /dev/null; then
-    log_message "❌  Error : Jupyter installation failed"
+# Checking installation
+if [ $? -eq 0 ]; then
+    log_message "✅  Python dependencies successfully installed"
+else
+    log_message "❌ Fail to install Python dependencies"
     exit 1
-else
-    log_message "✅  Jupyter installation successfully installed"
 fi
 
-log_message "🎉  Python virtual environment is ready !"
+# # Test
+# if ! jupyter --version &> /dev/null; then
+#     log_message "❌  Error : Jupyter installation failed"
+#     exit 1
+# else
+#     log_message "✅  Jupyter installation successfully installed"
+# fi
+
+# log_message "🎉  Python virtual environment is ready !"
 
 log_message ""
 log_message "# === END OF PROCESS === #"

@@ -23,10 +23,9 @@ It brings together reusable utilities, structured code organization, and cross-p
 ```shell
 EssencePy/ 
 ├── app/            # Python applications folder
-├── config/         # Configuration files (.yaml, .properties, etc.) 
+├── conf/         # Configuration files (.yaml, .properties, etc.) 
 ├── lib/            # Core Python libraries
-│ ├── bootstrap/    # Autoloaded main classes (e.g., bootstrap, init_code, AppEnv, ConfigYaml... etc.)
-│ └── init/         # Others external classes
+│ └── bootstrap/    # Autoloaded main classes (e.g., bootstrap, init_code, AppEnv, ConfigYaml... etc.)
 ├── logs/           # Application logs  (folder automatically created if not existing)
 ├── notebooks/      # Jupyter notebooks for development or analysis 
 ├── scripts/        # Core executable scripts
@@ -52,10 +51,12 @@ Feel free to fork, extend, and adapt EssencePy to your own workflows 💡
 ## 🛠️ How to use EssencePy
 1. First of all, clone the project 😉
 2. Edit `conf/env.conf` file and **setup** location for Python binaries in **PARENT_PYTHON_HOME** (for Linux) or **WIN_PARENT_PYTHON_HOME** (for Windows)
-3. Fulfill `conf/requirements.txt` file to add your required Python libs to project
-4. Launch the required script `project-init` (with correct extension for your system)
+3. Fulfill `conf/requirements.txt` file to add your required Python packages used by your project
+4. Launch the script `venv-create` (with correct extension for your system)
 
-This setup and script will create a **Python virtual environment**, loads dependencies and enables Jupyter (which can be used in your IDE, converting notebook...etc ). 
+This last action will create a **Python virtual environment** and load your required python packages. 
+
+If you want to dev with notebooks, you have to deploy 'Jupyter' package into your Python parent folder or into your virtual env. (with the requirements script for example).
 
 ### Main functions
 ```shell
@@ -64,8 +65,9 @@ This setup and script will create a **Python virtual environment**, loads depend
 cd <APPLICATION_HOME>/scripts/powershell
 .\notebook-converter.ps1 myNotebook.ipynb
 ```
+
 ```shell
-# Launching my Python program (example with a Windows OS)
+# Launching my Python program manually (example with a Windows OS)
 # Program is called myNotebook.py and stored in "app" folder 
 cd <APPLICATION_HOME>/scripts/powershell>
 .\app-start.ps1 myNotebook.py
@@ -73,25 +75,20 @@ cd <APPLICATION_HOME>/scripts/powershell>
 ## 💡 Some use cases
 ```md
 > Tip: I want to use my own Python lib. 
-Put your Python lib in "lib/" folder, then :
+
+Put your Python lib in "lib/" folder, then:
+
+# instanciate your class and use it
+my_cls = epy.load_cls(module_name='my_class_file', class_name='MyClass', args=[*args])
+
+foo = my_class.function()
+
 ```
-```python
-# import your class
-from lib.my_class import MyClass
-
-# instanciate
-my_cls = MyClass(**kargs)
-
-# using
-foo = my_cls.function()
-```
-
-
 
 ```md
 > Tip: I already have a Python program.
 
-Put your Python program in "app" folder and launch it with the required script
+Put your Python program in "app" folder and launch it with 'app-start' script
 ```
 
 ```md
@@ -101,10 +98,20 @@ VScode could be a little bit ennoying and can not detect your fresh Python virtu
 You have to set "python.defaultInterpreterPath" with your Python virtual env in VScode settings
 By default with value like: "rt/python/bin/python3"
 ```
+
+```md
+> Tip: Should I always use a Python virtualenv ?
+
+It is not necessary if you already have your required dependencies loaded in parent Python home or if you do not have need to isolate your program and packages. 
+
+However Python virtualenv is better for security reasons or professionnal workflow. You should use it without hesitate.
+```
 ### Currently working with
+
 - Windows 10    | Powershell 5.1    | Python 3.12.8
-- Centos 7      | Bash 4.2.46       | Python 3.11.11
+- ~~Centos 7      | Bash 4.2.46       | Python 3.11.11~~ (Centos7 is deprecated. I'm stopping tests on this OS)
 - MacOS 15      | Zsh 5.9           | Python 3.12 (installed by brew)
+- Ubuntu 24.04  | Bash 5.2.21       | Python 3.11.11
 
 ---
 Made with ❤️ for curious developers and pragmatic engineers.

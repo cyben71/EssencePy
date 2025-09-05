@@ -1,1 +1,2 @@
-jupyter == 1.1.1     # need for convert noteboook to python
+jupyter     # need for converting jupyter noteboook to python program and run notebooks
+pyyaml      # need for reading application.yaml file

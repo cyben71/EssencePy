@@ -1,5 +1,32 @@
 # EssencePy releases
 
+## Version 2.1.0 (2025-08-28)
+
+### Releases - Description
+Add function to load your own class more easily. Function is directly available in epy context. 
+Add current date in log files name
+Add scripts to load dependencies without virtualenv & Fix minor issues 
+
+```textile
+1) Upgrade 'README.md' and 'RELEASE.md'
+2) Under './lib/bootstrap/' directory:
+   + Add function 'log' (without prefix) in 'logger.py'
+   + Add function 'load_cls' in 'init_code.py'
+   + Declare function 'load_cls' in 'bootstrap.py'
+   + Declare function signature 'context.py'
+3) Under './lib' directory:
+   + Add file 'my_dummy_class.py' for example
+4) Under './notebooks' and ./app:
+   > Update notebook and program with and example of this new function
+5) Under '.scripts'
+   > Rename 'project-init' scripts to 'venv_create' (both powershell & shell)
+   > Update all scripts for adding current date in log files name (ex: win_setup_env.log -> win_setup_env_2025-08-25.log)
+   > Enhance display of log files
+   > Add scripts to deploy python dependencies (packages) without python virtualenv (or venv-create script)
+   > Fix issue using 'pip' exec on Linux OS (pip -> pip3)
+   > Fix issue detecting python folders between parent_home or virtual_env.
+```
+
 ## Version 2.0.0 (2025-08-06)
 
 ### Releases - Description

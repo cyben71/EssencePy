@@ -1,3 +1,20 @@
+<#
+    .SYNOPSIS
+    Launch Python program
+
+    .DESCRIPTION
+    Allow to execute Python program stored in 'app/' folder
+
+    .PARAMETER <python_filename>
+    Name of Python file
+
+    .PARAMETER <python_extension>
+    Python program extension is: '.py'
+
+    .EXAMPLE
+    ./scripts/powershell/app-start.ps1 notebook.py
+#>
+
 #################
 ### FUNCTIONS ###
 #################
@@ -35,8 +52,8 @@ while ($true) {
 $CONF_DIR = Join-Path $env:APPLICATION_HOME "conf"
 $CONF_FILE = Join-Path $CONF_DIR "env.conf"
 $LOG_DIR = Join-Path $env:APPLICATION_HOME "log"
-$LOG_FILE = Join-Path $LOG_DIR "win_start_app.log"
-$NOTEBOOK_DIR = Join-Path $env:APPLICATION_HOME "Notebooks"
+$CUR_DATE = $timestamp = Get-Date -Format "yyyy-MM-dd"
+$LOG_FILE = Join-Path $LOG_DIR "win_start_app_$CUR_DATE.log"
 $APP_DIR = Join-Path $env:APPLICATION_HOME "app"
 
 # ------------------------------------------------------------------------ #
@@ -98,7 +115,11 @@ $python_venv = Join-path -Path "$VENV_PYTHON_DIR\Scripts" $VENV_PYTHON_EXE
 # Initialisation
 $python = $null
 
-# checking virtual python
+LogMessage "--------------------------------"
+LogMessage "--- Executing Python program ---"
+LogMessage "--------------------------------"
+
+# checking virtual python exists
 if (-not (Test-Path -Path $python_venv -PathType Leaf)) {
     LogMessage "Virtual python not found in : $python_venv"
 
@@ -109,11 +130,12 @@ if (-not (Test-Path -Path $python_venv -PathType Leaf)) {
         exit 1
     } else {
         LogMessage "Python parent found : $python_parent"
+        $python_folder = $PARENT_PYTHON_HOME
         $python = $python_parent
     }
-
 } else {
     LogMessage "Virtual python environment detected : $python_venv"
+    $python_folder = $VENV_PYTHON_DIR
     $python = $python_venv
 }
 LogMessage
@@ -129,7 +151,6 @@ if ($args.Count -lt 1) {
 $application = $args[0]
 
 # Checking Application file exists
-#$ApplicationPath = [string]"$APP_DIR\$Application"
 $applicationPath = Join-Path $APP_DIR $application
 if (-not (Test-Path -Path $applicationPath -PathType Leaf)) {
     LogMessage "Error !!! Application file is missing : $applicationPath"
@@ -138,8 +159,6 @@ if (-not (Test-Path -Path $applicationPath -PathType Leaf)) {
 
 # Executing Application
 LogMessage "Executing application : $applicationPath"
-#$python_venv = "{0}\{1}" -f $VENV_PYTHON_DIR, "Scripts\python.exe"
-# & $python_venv $applicationPath
 & $python $applicationPath
 
 LogMessage ""

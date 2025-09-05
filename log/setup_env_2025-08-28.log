@@ -1,0 +1,23 @@
+2025-08-28 09:45:37 - # ============================= #
+2025-08-28 09:45:37 - # === INITIALIZING PROJECT ==== #
+2025-08-28 09:45:37 - # ============================= #
+2025-08-28 09:45:37 - 
+2025-08-28 09:45:37 - Config file location is : /home/cyben71/EssencePy/conf/env.conf
+2025-08-28 09:45:37 - PARENT_PYTHON_HOME : /opt/python/3.11.11
+2025-08-28 09:45:37 - PARENT_PYTHON_EXE : python3
+2025-08-28 09:45:37 - VENV_PYTHON_DIR : /home/cyben71/EssencePy/rt
+2025-08-28 09:45:37 - VENV_PYTHON_EXE : python3
+2025-08-28 09:45:37 - 
+2025-08-28 09:45:37 - -----------------------------------------------
+2025-08-28 09:45:37 - ---- Creating of virtual python environment ---
+2025-08-28 09:45:37 - -----------------------------------------------
+2025-08-28 09:45:37 - 
+2025-08-28 09:45:37 - 🔧  Creating Python virtual env...
+2025-08-28 09:45:40 - 🔄  Updating Pip...
+2025-08-28 09:45:42 - 📦  Python dependencies installation...
+2025-08-28 09:45:55 - ✅  Python dependencies successfully installed
+2025-08-28 09:45:55 - 
+2025-08-28 09:45:55 - 🎉  Python virtual environment is ready !
+2025-08-28 09:45:55 - 
+2025-08-28 09:45:55 - # === END OF PROCESS === #
+2025-08-28 09:45:55 - 
