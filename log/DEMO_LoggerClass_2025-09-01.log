@@ -1,0 +1,4 @@
+2025-09-01 10:48:36 - INFO : Testing INFO message : 2025-09-01 10:48:36
+2025-09-01 10:48:37 - WARN : Testing WARNING message : 2025-09-01 10:48:37
+2025-09-01 10:48:38 - ERROR : Testing ERROR message : 2025-09-01 10:48:38
+2025-09-01 10:49:53 : Testing message without prefix : 2025-09-01 10:49:53 
