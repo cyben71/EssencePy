@@ -6,6 +6,7 @@ from lib.bootstrap.cfgyaml import ConfigYaml
 from lib.bootstrap.cfgproperties import ConfigProperties
 from lib.bootstrap.appenv import AppEnv
 from lib.bootstrap.logger import Logger
+from lib.bootstrap.docgenerator import DocGenerator
 from typing import Any
 
 class Context(SimpleNamespace):
@@ -21,6 +22,7 @@ class Context(SimpleNamespace):
     cfgprops: ConfigProperties
     appenv: AppEnv
     log: Logger
+    doc: DocGenerator
     CFGYAML_FILE: str
     CFGENV_FILE: str
     CFGPROPS_FILE: str

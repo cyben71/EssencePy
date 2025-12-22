@@ -11,6 +11,7 @@ from lib.bootstrap import cfgyaml
 from lib.bootstrap import cfgproperties
 from lib.bootstrap import logger
 from lib.bootstrap import appenv
+from lib.bootstrap import docgenerator
 
 def init() -> None:
     # load and instanciate classes in context
@@ -18,6 +19,10 @@ def init() -> None:
     context.cfgprops = cfgproperties.ConfigProperties(app_home=context.APPLICATION_HOME)
     context.appenv = appenv.AppEnv()
     context.log = logger.Logger(app_home=context.APPLICATION_HOME, app_name=context.APPLICATION_NAME)
+
+    context.doc = docgenerator.DocGenerator(app_home=context.APPLICATION_HOME, 
+                                            output_file=f"{context.APPLICATION_HOME}/docs/auto_documentation.md"
+                                            )
 
 
 # load classes included in /lib/bootstrap
@@ -121,6 +126,8 @@ def load_class(module_name: str, class_name: str = None, args: list = []):
             raise ValueError(f"More than one class found in '{module_name}'. Use 'class_name'.")
 
     return cls(*args)
+
+
 
 
 def summarize_context() -> None:

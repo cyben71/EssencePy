@@ -8,3 +8,5 @@ rt/
 .DS_Store
 *checkpoint.*
 
+# .env files
+.env*
