@@ -12,7 +12,9 @@ class Logger:
 
     
     def __init__(self, app_home: str, app_name: str):
-        """Constructor
+        """
+        Constructor.
+
         Args:
             app_home (str): Parent location for this app
             app_name (str): Application name
@@ -31,25 +33,28 @@ class Logger:
     @property
     def get_log_folder(self) -> str:
         """
-        Return log folder
+        Return log folder.
         """
         return self._log_folder
     
     @property
     def get_log_file(self) -> str:
         """
-        Return log file
+        Return log file.
         """
         return self._log_file
     
     
     def log(self, message: str) -> None:
         """
-        Output a message in a log file without prefix and current date & timestamp
+        Output a message in a log file without prefix and current date & timestamp.
+
         Args:
             message (str): Message to output
-        Return:
-            None
+        
+        Example:
+            # Write a simple message into log file
+            epy.log.log("Testing SIMPLE message. No prefix added")
         """
         try:
             self._log(msg=message)
@@ -60,11 +65,14 @@ class Logger:
 
     def info(self, message: str) -> None:
         """
-        Output a message in a log file with 'INFO' as prefix and current date & timestamp
+        Output a message in a log file with 'INFO' as prefix and current date & timestamp.
+
         Args:
-            message (str): Message to output
-        Return:
-            None
+            message (str): Message to output.
+
+        Example:
+            # Write an INFO message into log file
+            epy.log.info("Testing INFO message")
         """
         prefix = 'INFO'
         try:
@@ -76,11 +84,14 @@ class Logger:
         
     def warning(self, message: str) -> None:
         """
-        Output a message in a log file with 'WARN' as prefix and current date & timestamp
+        Output a message in a log file with 'WARN' as prefix and current date & timestamp.
+        
         Args:
-            message (str): Message to output
-        Return:
-            None
+            message (str): Message to output.
+        
+        Example:
+            # Write a WARNING message into log file
+            epy.log.warning("Testing WARNING message")
         """
         prefix = 'WARN'
         try:
@@ -92,11 +103,14 @@ class Logger:
     
     def error(self, message: str) -> None:
         """
-        Output a message in a log file with 'ERROR' as prefix and current date & timestamp
+        Output a message in a log file with 'ERROR' as prefix and current date & timestamp.
+
         Args:
-            message (str): Message to output
-        Return:
-            None
+            message (str): Message to output.
+
+        Example:
+            # Write a ERROR message into log file
+            epy.log.error("Testing ERROR message")
         """
         prefix = 'ERROR'
         try:
@@ -115,8 +129,9 @@ class Logger:
              msg: Optional[str] = None
              ) -> None:
         """
-        Common method to write a message in a log file with current date & timestamp and a prefix (like INFO, WARN...)
-        If log folder doesn't exists, it will be created
+        Common method to write a message in a log file with current date & timestamp and a prefix (like INFO, WARN...).
+        If log folder doesn't exists, it will be created.
+        
         Args:
             prefix (str, optional): Prefix for line
             msg (str, optional): Message to write into log file

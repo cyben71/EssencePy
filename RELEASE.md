@@ -1,5 +1,17 @@
 # EssencePy releases
 
+## Version 2.2.0 (2025-12-xx)
+
+### Releases - Description
+Add class in EPY for generating technical documentation of current project or a specific class/module. 
+
+```textile
+1) Upgrade 'RELEASE.md'
+2) Under './lib/bootstrap/' directory:
+   + Add new module file 'docgenerator.py' with class 'DocGenerator'
+   > Fix tipo in docstrings for all module files
+```
+
 ## Version 2.1.0 (2025-08-28)
 
 ### Releases - Description

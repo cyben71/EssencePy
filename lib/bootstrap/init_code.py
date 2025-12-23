@@ -19,10 +19,7 @@ def init() -> None:
     context.cfgprops = cfgproperties.ConfigProperties(app_home=context.APPLICATION_HOME)
     context.appenv = appenv.AppEnv()
     context.log = logger.Logger(app_home=context.APPLICATION_HOME, app_name=context.APPLICATION_NAME)
-
-    context.doc = docgenerator.DocGenerator(app_home=context.APPLICATION_HOME, 
-                                            output_file=f"{context.APPLICATION_HOME}/docs/auto_documentation.md"
-                                            )
+    context.doc = docgenerator.DocGenerator(app_home=context.APPLICATION_HOME, app_name=context.APPLICATION_NAME)
 
 
 # load classes included in /lib/bootstrap
@@ -81,13 +78,15 @@ def load_epy_cls(epy: Context, app_home: Path , app_name: str) -> None:
 
 def load_class(module_name: str, class_name: str = None, args: list = []):
     """
-    Allow to load and instanciate your own python class (outside of lib/bootstrap)
+    Allow to load and instanciate your own python class (outside of lib/bootstrap).
+
     Args:
         module_name (str): Module name (without extension) to load. Ex: module_name = 'my_dummy_class'
         class_name (str, optional): Class name to load. Defaults to None.
         args (list, optional): List of arguments required by module. Defaults to [].
+
     Returns:
-        cls (object): a properly loaded module with its class
+        cls (object): a properly loaded module with its class.
     """
     # if not module_name and not class_name:
     #     raise ValueError("Au moins 'module_name' ou 'class_name' doit être fourni.")
@@ -132,7 +131,7 @@ def load_class(module_name: str, class_name: str = None, args: list = []):
 
 def summarize_context() -> None:
     """
-    Summurizing content of context
+    Summurizing content of context.
     """
     def supports_color() -> bool:
         if sys.stdout.isatty():
