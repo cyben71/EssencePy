@@ -3,6 +3,7 @@ tmp/
 __pycache__
 rt/
 .vscode/
+log/
 
 #  files
 .DS_Store

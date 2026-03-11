@@ -3,10 +3,9 @@
 > [!NOTE]
 > _This file was automatically created by EssencePy_
 
-
 ## Module `lib.bootstrap.appenv`
 
-*Source* : `C:\Users\cyben71\PYTHON_PROJECT\EssencePy\lib\bootstrap\appenv.py`
+*Source* : `C:\cyben71\PYTHON_PROJECT\EssencePy\lib\bootstrap\appenv.py`
 
 
 ### Class `AppEnv`
@@ -121,7 +120,7 @@ A tool class to get simple information about environnement.
 
 ## Module `lib.bootstrap.cfgproperties`
 
-*Source* : `C:\Users\bgonzale\Downloads\PYTHON_PROJECT\EssencePy-1\lib\bootstrap\cfgproperties.py`
+*Source* : `C:\Users\bgonzale\Downloads\PYTHON_PROJECT\EssencePy\lib\bootstrap\cfgproperties.py`
 
 
 ### Class `ConfigProperties`
@@ -154,7 +153,7 @@ Config files used by this class:
 
 ## Module `lib.bootstrap.cfgyaml`
 
-*Source* : `C:\Users\bgonzale\Downloads\PYTHON_PROJECT\EssencePy-1\lib\bootstrap\cfgyaml.py`
+*Source* : `C:\Users\bgonzale\Downloads\PYTHON_PROJECT\EssencePy\lib\bootstrap\cfgyaml.py`
 
 
 ### Class `ConfigYaml`
@@ -188,7 +187,7 @@ Config files used by this class:
 
 ## Module `lib.bootstrap.context`
 
-*Source* : `C:\Users\bgonzale\Downloads\PYTHON_PROJECT\EssencePy-1\lib\bootstrap\context.py`
+*Source* : `C:\Users\bgonzale\Downloads\PYTHON_PROJECT\EssencePy\lib\bootstrap\context.py`
 
 
 ### Class `Context`
@@ -224,7 +223,7 @@ Usefull for IDE like Vscode.
 
 ## Module `lib.bootstrap.docgenerator`
 
-*Source* : `C:\Users\bgonzale\Downloads\PYTHON_PROJECT\EssencePy-1\lib\bootstrap\docgenerator.py`
+*Source* : `C:\Users\bgonzale\Downloads\PYTHON_PROJECT\EssencePy\lib\bootstrap\docgenerator.py`
 
 
 ### Class `DocGenerator`
@@ -269,7 +268,7 @@ The output is a Markdown file.
 
 ## Module `lib.bootstrap.logger`
 
-*Source* : `C:\Users\bgonzale\Downloads\PYTHON_PROJECT\EssencePy-1\lib\bootstrap\logger.py`
+*Source* : `C:\Users\bgonzale\Downloads\PYTHON_PROJECT\EssencePy\lib\bootstrap\logger.py`
 
 
 ### Class `Logger`
@@ -351,7 +350,7 @@ Class for handling actions in log files
 
 ## Module `my_dummy_class`
 
-*Source* : `C:\Users\bgonzale\Downloads\PYTHON_PROJECT\EssencePy-1\lib\my_dummy_class.py`
+*Source* : `C:\Users\bgonzale\Downloads\PYTHON_PROJECT\EssencePy\lib\my_dummy_class.py`
 
 
 ### Class `Dummy`
