@@ -1,15 +1,18 @@
 # EssencePy releases
 
-## Version 2.2.0 (2025-12-xx)
+## Version 2.2.0 (2026-03-31)
 
 ### Releases - Description
 Add class in EPY for generating technical documentation of current project or a specific class/module. 
+Fix security problem from subprocess. Refactoring Logger class.
 
 ```textile
 1) Upgrade 'RELEASE.md'
 2) Under './lib/bootstrap/' directory:
    + Add new module file 'docgenerator.py' with class 'DocGenerator'
    > Fix tipo in docstrings for all module files
+3) > Refactoring Logger class using stdlib and adding set_level and debug functions (version 2.0.0)
+4) > Enhancing cfgproperties deleting subprocess call and its function
 ```
 
 ## Version 2.1.0 (2025-08-28)

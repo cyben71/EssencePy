@@ -17,22 +17,6 @@ class AppEnv:
         """
         Constructor
         """
-        
-        # instance variables (hidden for more clarety in IDE)
-        # self._application_home = app_home
-        # self._application_name = app_name
-        
-        
-        # # Loading config files (conf, yaml or properties)
-        # self._config = ConfigProperties(self._application_home)
-        # self._yaml = ConfigYaml(self._application_home)
-        # self.test = epy.cfg_yaml()
-                
-        # # Getting env variables and display
-        # env_config = self._setup_environment()
-        # print(">> Configuration actuelle : <<")
-        # for k, v in env_config.items():
-        #     print(f"{k}: {v}")
 
 
     #####################################
@@ -179,7 +163,3 @@ class AppEnv:
             created = True
         return created
         
-    
-    ######################################
-    ##### PRIVATE METHOD & FUNCTIONS #####
-    ######################################  
