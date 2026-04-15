@@ -3,15 +3,23 @@
 > [!NOTE]
 > _This file was automatically created by EssencePy_
 
-
 ## Module `lib.bootstrap.appenv`
 
-*Source* : `C:\Users\cyben71\PYTHON_PROJECT\EssencePy\lib\bootstrap\appenv.py`
+*Source* : `C:\cyben71\PYTHON_PROJECT\EssencePy\lib\bootstrap\appenv.py`
 
 
 ### Class `AppEnv`
 
-A tool class to get simple information about environnement.
+A tool class to get information about the execution environment.
+Handles OS detection, date/time utilities, file system helpers,
+and user environment variable loading for any context:
+local, remote, interactive or non-interactive (JupyterLab, VS Code remote, systemd).
+
+On Linux  : parses ~/.bash_env, ~/.bashrc, ~/.bash_profile, ~/.profile
+and injects ALL exported variables into os.environ (overwrite enabled).
+On Windows: captures full os.environ snapshot (already populated by the OS).
+
+Calling load() or relaunching init_env() always produces a fresh, complete snapshot.
 
 - **get_current_date(pattern: Optional[str] = None) -> str**
 
@@ -23,17 +31,16 @@ A tool class to get simple information about environnement.
 
     | Name | Description |
     |------|-------------|
-    | `pattern (str, optional)` | Pattern for diplaying date. |
+    | `pattern (str, optional)` | Pattern for displaying date. |
 
 
     **Returns**
 
-    - current_date (str): Current date displaying with chosen pattern.
+    - str: Current date with chosen pattern.
 
     **Example**
 
     ```python
-    # pattern for date formating
     date1 = epy.appenv.get_current_date(pattern='%Y-%m-%d')
     date2 = epy.appenv.get_current_date(pattern='%d/%m/%Y')
     ```
@@ -47,11 +54,11 @@ A tool class to get simple information about environnement.
 
     | Name | Description |
     |------|-------------|
-    | `pattern (str, optional)` | Pattern for diplaying time. |
+    | `pattern (str, optional)` | Pattern for displaying time. |
 
     **Returns**
 
-    - current_time (str): Current time displaying with chosen pattern.
+    - str: Current time with chosen pattern.
 - **get_hostname() -> str**
 
     Return hostname.
@@ -60,52 +67,7 @@ A tool class to get simple information about environnement.
     Return type of system.
 - **is_file_exists(location: str) -> bool**
 
-    Checking file exists from specified location.
-
-
-
-    **Arguments**
-
-    | Name | Description |
-    |------|-------------|
-    | `file (str)` | File location. |
-
-    **Returns**
-
-    - exists (bool): True / False if file exists
-- **is_folder_exists(location: str) -> bool**
-
-    Checking folder exists from specified location.
-
-
-
-    **Arguments**
-
-    | Name | Description |
-    |------|-------------|
-    | `location (str)` | Folder location. |
-
-    **Returns**
-
-    - exists (bool): True / False if folder exists
-- **mkdir(location: str) -> bool**
-
-    Create a folder from a location.
-
-
-
-    **Arguments**
-
-    | Name | Description |
-    |------|-------------|
-    | `location (str)` | Folder location to create. |
-
-    **Returns**
-
-    - created (bool): True / False if folder is successfully created
-- **rm_file(location: str) -> bool**
-
-    Delete a file if exists in location.
+    Check if a file exists at specified location.
 
 
 
@@ -117,11 +79,81 @@ A tool class to get simple information about environnement.
 
     **Returns**
 
-    - deleted (bool): True / False if file is sucessfully deleted
+    - bool: True if file exists, False otherwise.
+- **is_folder_exists(location: str) -> bool**
+
+    Check if a folder exists at specified location.
+
+
+
+    **Arguments**
+
+    | Name | Description |
+    |------|-------------|
+    | `location (str)` | Folder location. |
+
+    **Returns**
+
+    - bool: True if folder exists, False otherwise.
+- **load(self) -> Dict[str, str]**
+
+    Load (or reload) all environment variables into os.environ.
+
+    Always performs a full reload — existing values in os.environ
+    are overwritten if a newer value is found in the profile files.
+    Call this after modifying ~/.bash_env or any shell profile,
+    without restarting the kernel.
+
+
+
+    **Returns**
+
+    - Dict[str, str]: Full snapshot of loaded variables.
+
+    **Example**
+
+    ```python
+    # Initial load (called automatically at init)
+    epy = init_env()
+
+    # After modifying ~/.bash_env in your terminal:
+    epy.appenv.load()
+    print(epy.appenv.loaded_vars)
+    ```
+- **mkdir(location: str) -> bool**
+
+    Create a folder at specified location.
+
+
+
+    **Arguments**
+
+    | Name | Description |
+    |------|-------------|
+    | `location (str)` | Folder location to create. |
+
+    **Returns**
+
+    - bool: True if successfully created, False otherwise.
+- **rm_file(location: str) -> bool**
+
+    Delete a file if it exists.
+
+
+
+    **Arguments**
+
+    | Name | Description |
+    |------|-------------|
+    | `location (str)` | File location. |
+
+    **Returns**
+
+    - bool: True if successfully deleted, False otherwise.
 
 ## Module `lib.bootstrap.cfgproperties`
 
-*Source* : `C:\Users\bgonzale\Downloads\PYTHON_PROJECT\EssencePy-1\lib\bootstrap\cfgproperties.py`
+*Source* : `C:\cyben71\PYTHON_PROJECT\EssencePy\lib\bootstrap\cfgproperties.py`
 
 
 ### Class `ConfigProperties`
@@ -154,7 +186,7 @@ Config files used by this class:
 
 ## Module `lib.bootstrap.cfgyaml`
 
-*Source* : `C:\Users\bgonzale\Downloads\PYTHON_PROJECT\EssencePy-1\lib\bootstrap\cfgyaml.py`
+*Source* : `C:\cyben71\PYTHON_PROJECT\EssencePy\lib\bootstrap\cfgyaml.py`
 
 
 ### Class `ConfigYaml`
@@ -188,7 +220,7 @@ Config files used by this class:
 
 ## Module `lib.bootstrap.context`
 
-*Source* : `C:\Users\bgonzale\Downloads\PYTHON_PROJECT\EssencePy-1\lib\bootstrap\context.py`
+*Source* : `C:\cyben71\PYTHON_PROJECT\EssencePy\lib\bootstrap\context.py`
 
 
 ### Class `Context`
@@ -224,7 +256,7 @@ Usefull for IDE like Vscode.
 
 ## Module `lib.bootstrap.docgenerator`
 
-*Source* : `C:\Users\bgonzale\Downloads\PYTHON_PROJECT\EssencePy-1\lib\bootstrap\docgenerator.py`
+*Source* : `C:\cyben71\PYTHON_PROJECT\EssencePy\lib\bootstrap\docgenerator.py`
 
 
 ### Class `DocGenerator`
@@ -269,16 +301,21 @@ The output is a Markdown file.
 
 ## Module `lib.bootstrap.logger`
 
-*Source* : `C:\Users\bgonzale\Downloads\PYTHON_PROJECT\EssencePy-1\lib\bootstrap\logger.py`
+*Source* : `C:\cyben71\PYTHON_PROJECT\EssencePy\lib\bootstrap\logger.py`
 
 
 ### Class `Logger`
 
-Class for handling actions in log files
+Class for handling application logging using Python stdlib logging module.
+Writes to both a rotating log file and the console (configurable).
 
-- **error(self, message: str) -> None**
+Log file is automatically created in <app_home>/log/ folder.
+File rotation is triggered when file size exceeds max_bytes (default: 5MB),
+keeping up to backup_count previous files.
 
-    Output a message in a log file with 'ERROR' as prefix and current date & timestamp.
+- **debug(self, message: str) -> None**
+
+    Output a debug message (only visible when log level is DEBUG).
 
 
 
@@ -291,12 +328,28 @@ Class for handling actions in log files
     **Example**
 
     ```python
-    # Write a ERROR message into log file
-    epy.log.error("Testing ERROR message")
+    epy.log.debug("Variable x = 42")
+    ```
+- **error(self, message: str) -> None**
+
+    Output a message with 'ERROR' prefix.
+
+
+
+    **Arguments**
+
+    | Name | Description |
+    |------|-------------|
+    | `message (str)` | Message to output. |
+
+    **Example**
+
+    ```python
+    epy.log.error("Failed to connect to database")
     ```
 - **info(self, message: str) -> None**
 
-    Output a message in a log file with 'INFO' as prefix and current date & timestamp.
+    Output a message with 'INFO' prefix.
 
 
 
@@ -309,30 +362,11 @@ Class for handling actions in log files
     **Example**
 
     ```python
-    # Write an INFO message into log file
-    epy.log.info("Testing INFO message")
+    epy.log.info("Application started")
     ```
 - **log(self, message: str) -> None**
 
-    Output a message in a log file without prefix and current date & timestamp.
-
-
-
-    **Arguments**
-
-    | Name | Description |
-    |------|-------------|
-    | `message (str)` | Message to output |
-
-    **Example**
-
-    ```python
-    # Write a simple message into log file
-    epy.log.log("Testing SIMPLE message. No prefix added")
-    ```
-- **warning(self, message: str) -> None**
-
-    Output a message in a log file with 'WARN' as prefix and current date & timestamp.
+    Output a message in log file without prefix.
 
 
 
@@ -345,13 +379,46 @@ Class for handling actions in log files
     **Example**
 
     ```python
-    # Write a WARNING message into log file
-    epy.log.warning("Testing WARNING message")
+    epy.log.log("Simple message, no prefix")
+    ```
+- **set_level(self, level: str) -> None**
+
+    Change the log level at runtime.
+
+
+
+    **Arguments**
+
+    | Name | Description |
+    |------|-------------|
+    | `level (str)` | Log level. Accepted values: 'DEBUG', 'INFO', 'WARNING', 'ERROR'. |
+
+    **Example**
+
+    ```python
+    epy.log.set_level("DEBUG")
+    ```
+- **warning(self, message: str) -> None**
+
+    Output a message with 'WARNING' prefix.
+
+
+
+    **Arguments**
+
+    | Name | Description |
+    |------|-------------|
+    | `message (str)` | Message to output. |
+
+    **Example**
+
+    ```python
+    epy.log.warning("Config file not found, using defaults")
     ```
 
 ## Module `my_dummy_class`
 
-*Source* : `C:\Users\bgonzale\Downloads\PYTHON_PROJECT\EssencePy-1\lib\my_dummy_class.py`
+*Source* : `C:\cyben71\PYTHON_PROJECT\EssencePy\lib\my_dummy_class.py`
 
 
 ### Class `Dummy`
