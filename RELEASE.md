@@ -1,12 +1,12 @@
 # EssencePy releases
 
-## Version 2.2.0 (2026-04-15)
+## Version 2.2.0 (2026-04-21)
 
 ### Releases - Description
 Add a new class in EPY for generating technical documentation of current project or a specific class/module. <br>
 Fix security problem from subprocess. <br>
 Refactoring Logger class. <br>
-Improving retrieval of environment variables under Windows & Linux
+Improving retrieval of environment variables under Windows & Linux (cfgProperties & cfgYaml)
 
 ```textile
 1) Upgrade 'RELEASE.md'
@@ -15,6 +15,7 @@ Improving retrieval of environment variables under Windows & Linux
    > Declare new modules files in 'init_code.py' and 'context.py'
    > Refactoring `Logger` class using stdlib and adding set_level and debug functions (version 2.0.0)
    > Enhancing `CfgProperties` class by deleting subprocess call (version 1.0.2)
+   > Enhancing `CfgYaml` class by adding recursive search for environment's variables (version 1.0.2)
    > Enhancing `AppEnv` class to being more efficient for retreieving environment's variables (version 1.0.2)
 3) > Fix tipo in docstrings for all module files
 ```

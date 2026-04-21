@@ -1,4 +1,4 @@
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 import os, sys
 import yaml
@@ -78,8 +78,6 @@ class ConfigYaml:
             for k in keys:
                 value = value[k]    # get nested key
 
-            # enabling stripping
-            #return self._strip_value(value) if strip_values else value
             if strip_values:
                 return self._strip_value(value)
             else:
@@ -106,11 +104,9 @@ class ConfigYaml:
         if isinstance(value, str):
             return value.strip()
         elif isinstance(value, Dict):
-            # use recursive call for all dictionary values
             values: Any = value.items()
             return {k: self._strip_value(v) for k, v in values}
         elif isinstance(value, List):
-            # use recursive call for all list values
             values: Any = value
             return [self._strip_value(item) for item in values]
         return value
@@ -118,16 +114,25 @@ class ConfigYaml:
     def _resolve_env_vars(self, value: Any) -> Any:
         """
         Replacing placeholders ${VARIABLES} found in a value by its real value coming from OS env. variables.
+        Handles nested structures: recursively processes dict and list values.
 
         Args:
             value (Any): Value which can contain placeholders in format ${VARIABLES}.
+                         Can be a str, dict, list, or any other type.
 
         Returns:
-            str: Final value with solved OS env. variable.
+            Any: Final value with solved OS env. variables, preserving the original structure.
         """
         if isinstance(value, str):
-            resolved = re.sub(r"\$\{(\w+)\}", lambda match: os.getenv(match.group(1), match.group(0)), value)
-            return resolved
+            return re.sub(
+                r"\$\{(\w+)\}",
+                lambda match: os.getenv(match.group(1), match.group(0)),
+                value
+            )
+        elif isinstance(value, dict):
+            return {k: self._resolve_env_vars(v) for k, v in value.items()}
+        elif isinstance(value, list):
+            return [self._resolve_env_vars(item) for item in value]
         return value
 
     def _resolve_nested_vars(self, data: Any, root: Optional[Any]=None) -> Any:
@@ -169,11 +174,9 @@ class ConfigYaml:
             # raw loading yaml file 
             raw_config = yaml.safe_load(file)
             
-            # Replacing OS env. variables found in raw_config
-            resolved_config = self._resolve_nested_vars(
-                {k: self._resolve_env_vars(v) for k, v in raw_config.items()}
-            )
+            # Replacing OS env. variables found in raw_config (all levels, recursively)
+            resolved_config = self._resolve_env_vars(raw_config)
 
             # solving internal references
             self._config = self._resolve_nested_vars(resolved_config)
-
+            
