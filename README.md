@@ -23,7 +23,7 @@ It brings together reusable utilities, structured code organization, and cross-p
 ```shell
 EssencePy/ 
 ├── app/            # Python applications folder
-├── conf/         # Configuration files (.yaml, .properties, etc.) 
+├── conf/           # Configuration files (.yaml, .properties, etc.) 
 ├── lib/            # Core Python libraries
 │ └── bootstrap/    # Autoloaded main classes (e.g., bootstrap, init_code, AppEnv, ConfigYaml... etc.)
 ├── logs/           # Application logs  (folder automatically created if not existing)
@@ -46,13 +46,13 @@ EssencePy/
 This project started as a personal toolkit to accelerate scripting and automation tasks across various technical contexts.
 Now open-sourced to share its benefits, and evolve through real-world usage.
 
-Feel free to fork, extend, and adapt EssencePy to your own workflows 💡
+Feel free to fork, extend, and adapt EssencePy to your own workflows. 💡
 
 ## 🛠️ How to use EssencePy
-1. First of all, clone the project 😉
-2. Edit `conf/env.conf` file and **setup** location for Python binaries in **PARENT_PYTHON_HOME** (for Linux) or **WIN_PARENT_PYTHON_HOME** (for Windows)
-3. Fulfill `conf/requirements.txt` file to add your required Python packages used by your project
-4. Launch the script `venv-create` (with correct extension for your system)
+1. First of all, clone the project. 😉
+2. Edit `conf/env.conf` file and **setup** location for Python binaries in **PARENT_PYTHON_HOME** (for Linux) or **WIN_PARENT_PYTHON_HOME** (for Windows).
+3. Fulfill `conf/requirements.txt` file to add your required Python packages used by your project.
+4. Launch the script `venv-create` (with correct extension for your system).
 
 This last action will create a **Python virtual environment** and load your required python packages. 
 
