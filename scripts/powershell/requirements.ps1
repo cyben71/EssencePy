@@ -29,7 +29,7 @@ function LogMessage {
 ### SETTINGS ###
 ################
 
-# Trouver APPLICATION_HOME
+# Finding APPLICATION_HOME by going up folders until we find bootstrap.py in lib/bootstrap/ directory
 $currentDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 while ($true) {
     $candidate = Join-Path $currentDir "lib/bootstrap/bootstrap.py"
@@ -60,7 +60,7 @@ LogMessage "# === INSTALLING REQUIREMENTS === #"
 LogMessage "# =============================== #"
 LogMessage ""
 
-# create log folder if not exists and log file
+# Create log folder if not exists and log file
 if (-not (Test-Path -Path $LOG_DIR -PathType Container)) {
     New-Item -Path $LOG_DIR -ItemType Directory
 }

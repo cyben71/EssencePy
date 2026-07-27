@@ -1,4 +1,4 @@
-__version__ = "1.0.2"
+__version__ = "1.1.0"
 
 import os, sys
 import re
@@ -14,6 +14,11 @@ class ConfigProperties:
     Config files used by this class: 
     - conf/env.conf : mainly storing python environment variables like python executer location.
     - conf/application.properties : contains properties used par application.
+
+    Environment variable resolution order for ${VAR} placeholders:
+    1. .env file (dotenv) located next to application.properties, or in cwd as fallback — takes priority
+    2. OS session environment variables (os.environ) as fallback
+    3. Unresolved placeholder kept as-is
     """
     alias = "cfgprops"
 
@@ -26,9 +31,13 @@ class ConfigProperties:
         """
         self._application_home = app_home
         self._config: Dict[str, Any] = {}
+        self._dotenv_vars: Dict[str, str] = {}
         
         self._properties_file = os.path.join(self._application_home, "conf", "application.properties")
         self._env_file = os.path.join(self._application_home, "conf", "env.conf")
+
+        # Load .env file if present (silent if not found)
+        self._load_dotenv()
         
         self._load_file(self._env_file)         # Loading and store variables from env.conf
         self._load_file(self._properties_file)  # Loading and store variables from application.properties.
@@ -60,6 +69,14 @@ class ConfigProperties:
         Return location for config file: application.properties.
         """
         return self._properties_file
+
+    @property
+    def get_dotenv_vars(self) -> Dict[str, str]:
+        """
+        Return variables loaded from .env file (read-only copy).
+        Returns an empty dict if no .env file was found.
+        """
+        return dict(self._dotenv_vars)
     
     @property
     def get_parent_python_home(self) -> str:
@@ -102,6 +119,36 @@ class ConfigProperties:
     ##### PRIVATE METHOD & FUNCTIONS ####
     #####################################
 
+    def _load_dotenv(self) -> None:
+        """
+        Load variables from a .env file into the private _dotenv_vars dict.
+        Does NOT inject into os.environ to avoid side effects.
+
+        Search order:
+        1. Same directory as application.properties (conf/)
+        2. Current working directory (cwd) as fallback
+
+        If no .env file is found in either location, _dotenv_vars stays empty
+        and no error is raised (silent fallback).
+        """
+        try:
+            from dotenv import dotenv_values
+
+            # 1st: look next to the properties config file
+            dotenv_path = os.path.join(os.path.dirname(self._properties_file), ".env")
+
+            # 2nd fallback: current working directory
+            if not os.path.isfile(dotenv_path):
+                dotenv_path = os.path.join(os.getcwd(), ".env")
+
+            if os.path.isfile(dotenv_path):
+                self._dotenv_vars = {
+                    k: v for k, v in dotenv_values(dotenv_path).items() if v is not None
+                }
+        except ImportError:
+            # python-dotenv not installed — dotenv support silently disabled
+            pass
+
     def _load_file(self, file_path: str) -> None:
         """
         Loading a config file (.properties or .conf). 
@@ -140,7 +187,12 @@ class ConfigProperties:
 
     def _resolve_env_vars(self, value: Any) -> Any:
         """
-        Replacing placeholders ${VAR} found in a string by its value from  _config.
+        Replacing placeholders ${VAR} found in a string by its resolved value.
+
+        Resolution order for each placeholder:
+        1. Variables loaded from .env file (_dotenv_vars) — takes priority
+        2. OS session environment variables (os.environ) as fallback
+        3. Original placeholder kept as-is if not found in either source
 
         Args:
             value (str): String which can contain placeholders in format ${VAR}.
@@ -149,7 +201,17 @@ class ConfigProperties:
             str: String with solved value of environment variables.
         """
         if isinstance(value, str):
-            return re.sub(r"\$\{(\w+)\}", lambda match: os.getenv(match.group(1), match.group(0)), value)
+            def _resolve(match):
+                var_name = match.group(1)
+                # 1. .env file takes priority
+                resolved = self._dotenv_vars.get(var_name)
+                # 2. OS session as fallback
+                if resolved is None:
+                    resolved = os.getenv(var_name)
+                # 3. keep placeholder if not found
+                return resolved if resolved is not None else match.group(0)
+
+            return re.sub(r"\$\{(\w+)\}", _resolve, value)
         return value
 
     def _strip_value(self, value: Any) -> Any:

@@ -31,7 +31,7 @@ function LogMessage {
 ### SETTINGS ###
 ################
 
-# Trouver APPLICATION_HOME
+# Finding APPLICATION_HOME by going up folders until we find bootstrap.py in lib/bootstrap/ directory
 $currentDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 while ($true) {
     $candidate = Join-Path $currentDir "lib/bootstrap/bootstrap.py"
@@ -158,9 +158,28 @@ if (-not (Test-Path -Path $applicationPath -PathType Leaf)) {
 }
 
 # Executing Application
+# We force the CWD to APPLICATION_HOME (project root) to ensure
+# that loading the .env file via Python (using a relative path) works
+# regardless of where the script was called from (batch file, scheduler, etc.)
+LogMessage "Setting working directory to : $env:APPLICATION_HOME"
+Set-Location -Path $env:APPLICATION_HOME
+
+# Force UTF-8 for Python: prevents UnicodeEncodeError (e.g., emojis in
+# print() calls) when stdout is redirected to a log file and the
+# console defaults to cp1252/cp850 on Windows.
+$env:PYTHONUTF8 = "1"
+$env:PYTHONIOENCODING = "utf-8"
+
 LogMessage "Executing application : $applicationPath"
 & $python $applicationPath
+$pythonExitCode = $LASTEXITCODE
+
+if ($pythonExitCode -ne 0) {
+    LogMessage "Error !!! Python program exited with code $pythonExitCode"
+}
 
 LogMessage ""
 LogMessage "# === END OF PROCESS === #"
 LogMessage ""
+
+exit $pythonExitCode

@@ -38,7 +38,7 @@ function LogMessage {
 ### SETTINGS ###
 ################
 
-# Trouver APPLICATION_HOME
+# Finding APPLICATION_HOME by going up folders until we find bootstrap.py in lib/bootstrap/ directory
 $currentDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 while ($true) {
     $candidate = Join-Path $currentDir "lib/bootstrap/bootstrap.py"

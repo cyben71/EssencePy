@@ -1,4 +1,4 @@
-__version__ = "1.0.4"
+__version__ = "1.0.5"
 
 import importlib.util
 import inspect
@@ -6,13 +6,15 @@ import platform
 import sys
 import os
 from pathlib import Path
+from typing import Any, List, Type, TypeVar, overload
 from lib.bootstrap.context import context, Context
 from lib.bootstrap import cfgyaml
 from lib.bootstrap import cfgproperties
 from lib.bootstrap import logger
 from lib.bootstrap import appenv
 from lib.bootstrap import docgenerator
-# from lib.bootstrap import envloader
+
+T = TypeVar('T')
 
 def init() -> None:
 
@@ -82,8 +84,15 @@ def load_epy_cls(epy: Context, app_home: Path , app_name: str) -> None:
         except Exception as e:
             print(f"[load_epy_cls] - Error on instanciating of {cls.__name__}: {e}")
 
+@overload
+def load_class(module_name: str, class_name: str = "", args: List[Any] = [], *, cls_type: Type[T]) -> T: 
+    ...
 
-def load_class(module_name: str, class_name: str = None, args: list = []):
+@overload
+def load_class(module_name: str, class_name: str = "", args: List[Any] = [], *, cls_type: None = None) -> Any:
+    ...
+
+def load_class(module_name: str, class_name: str = "", args: List[Any] = [], *, cls_type: Type[T] | None = None) -> T | Any:
     """
     Allow to load and instanciate your own python class (outside of lib/bootstrap).
 
@@ -91,6 +100,7 @@ def load_class(module_name: str, class_name: str = None, args: list = []):
         module_name (str): Module name (without extension) to load. Ex: module_name = 'my_dummy_class'
         class_name (str, optional): Class name to load. Defaults to None.
         args (list, optional): List of arguments required by module. Defaults to [].
+        cls_type (Type[T], optional): Expected class type for static analysis. Defaults to None.
 
     Returns:
         cls (object): a properly loaded module with its class.
@@ -99,7 +109,7 @@ def load_class(module_name: str, class_name: str = None, args: list = []):
     #     raise ValueError("Au moins 'module_name' ou 'class_name' doit être fourni.")
 
     # Add lib to python context if not exists
-    lib_path = Path(context.APPLICATION_HOME) / "lib"
+    lib_path: str = str(Path(context.APPLICATION_HOME) / "lib")
     if lib_path not in sys.path:
         sys.path.insert(0, lib_path)
 
@@ -118,12 +128,12 @@ def load_class(module_name: str, class_name: str = None, args: list = []):
         raise ImportError(f"Module '{module_name}' can not be loaded - {e}")
 
     # Looking for class
-    if class_name:
+    if class_name != "":
         cls = getattr(mod, class_name, None)
         if cls is None:
             raise AttributeError(f"Class '{class_name}' is not found in '{module_name}' module")
     else:
-        classes = [obj for name, obj in inspect.getmembers(mod, inspect.isclass) if obj.__module__ == mod.__name__]
+        classes = [obj for _, obj in inspect.getmembers(mod, inspect.isclass) if obj.__module__ == mod.__name__]
         if len(classes) == 1:
             cls = classes[0]
         elif len(classes) == 0:

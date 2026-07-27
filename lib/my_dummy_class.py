@@ -1,4 +1,4 @@
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 
 class Dummy:
@@ -28,7 +28,12 @@ class Dummy:
         Returns:
             str: Result of function
         """
-        print(f"Hello World from {self.app_home}")
+        str_return: str = ""
+        if arg1 != "":
+            str_return = f"Hello World from {self.app_home}"
+        else:
+            str_return = f"Where is expected args ?" 
+        return str_return
 
 # class Foo:
 

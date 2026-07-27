@@ -1,6 +1,8 @@
 # EssencePy
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
 ![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python)
-![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey)
+![Python](https://img.shields.io/badge/Python-3.14-blue?logo=python)
+![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20Apple-lightgrey)
 
 **EssencePy** is a lightweight and modular Python project designed to serve as a modular foundation for technical projects and automation workflows.
 It brings together reusable utilities, structured code organization, and cross-platform compatibility (Linux & Windows), making it ideal for building reliable tools quickly.
@@ -79,7 +81,8 @@ cd <APPLICATION_HOME>/scripts/powershell>
 Put your Python lib in "lib/" folder, then:
 
 # instanciate your class and use it
-my_cls = epy.load_cls(module_name='my_class_file', class_name='MyClass', args=[*args])
+from lib.my_class_file import MyClass
+my_cls: MyClass = epy.load_cls(module_name='my_class_file', class_name='MyClass', args=[*args], cls_type=MyClass)
 
 foo = my_class.function()
 
@@ -108,10 +111,11 @@ However Python virtualenv is better for security reasons or professionnal workfl
 ```
 ### Currently working with
 
-- Windows 10    | Powershell 5.1    | Python 3.12.8
-- ~~Centos 7      | Bash 4.2.46       | Python 3.11.11~~ (Centos7 is deprecated. I'm stopping tests on this OS)
-- MacOS 15      | Zsh 5.9           | Python 3.12 (installed by brew)
-- Ubuntu 24.04  | Bash 5.2.21       | Python 3.11.11
+- Windows 10            | Powershell 5.1    | Python 3.12.8 / Python 3.14.6
+- ~~Centos 7            | Bash 4.2.46       | Python 3.11.11~~ (Centos7 is deprecated. I'm stopping tests on this OS)
+- MacOS 26 (Intel)      | Zsh 5.9           | Python 3.12 (installed by brew)
+- MacOS 26 (Silicon)    | Zsh 5.9           | Python 3.14
+- Ubuntu 24.04          | Bash 5.2.21       | Python 3.11.11
 
 ---
 Made with ❤️ for curious developers and pragmatic engineers.
