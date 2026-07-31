@@ -31,6 +31,23 @@ function LogMessage {
 ### SETTINGS ###
 ################
 
+# ------------------------------------------------------------------------ #
+# Encoding: forces the console to decode using UTF-8, regardless of the
+# terminal used (cmd, native PowerShell, VSCode). Without this,
+# accented characters/emojis written by Python (PYTHONUTF8=1, below)
+# are decoded incorrectly by the console -> mojibake.
+# ------------------------------------------------------------------------ #
+chcp 65001 > $null
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
+# ------------------------------------------------------------------------ #
+# Prevents the "error" formatting (red text) that PowerShell 7.3+ applies
+# by default to any native command writing to stderr with a non-zero
+# exit code (Python tracebacks trigger this behavior).
+# Has no effect on PowerShell 5.1, which does not recognize this variable.
+# ------------------------------------------------------------------------ #
+$PSNativeCommandUseErrorActionPreference = $false
+
 # Finding APPLICATION_HOME by going up folders until we find bootstrap.py in lib/bootstrap/ directory
 $currentDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 while ($true) {
@@ -94,6 +111,30 @@ Get-Content $CONF_FILE | ForEach-Object {
 }
 Set-Variable -Name "VENV_PYTHON_DIR" -Value $VENV_PYTHON_DIR
 Set-Variable -Name "VENV_PYTHON_EXE" -Value $PARENT_PYTHON_EXE
+
+# ------------------------------------------------------------------------ #
+# Optional CA bundle file: if the project defines a WIN_CA_BUNDLE var in conf/env.conf
+# (absolute path, or path relative to APPLICATION_HOME) and the file exists,
+# it is used as an additional CA for Python (SSL_CERT_FILE /
+# REQUESTS_CA_BUNDLE). 
+# It remains completely inactive if the variable is not
+# defined: 
+# it affects only projects that require it without imposing anything on others.
+# (e.g., corporate SSL inspection proxies like zscaler)
+# ------------------------------------------------------------------------ #
+if ($CA_BUNDLE) {
+    $caBundlePath = $CA_BUNDLE
+    if (-not [System.IO.Path]::IsPathRooted($caBundlePath)) {
+        $caBundlePath = Join-Path $env:APPLICATION_HOME $caBundlePath
+    }
+    if (Test-Path -Path $caBundlePath -PathType Leaf) {
+        $env:SSL_CERT_FILE = $caBundlePath
+        $env:REQUESTS_CA_BUNDLE = $caBundlePath
+        LogMessage "CA bundle loaded : $caBundlePath"
+    } else {
+        LogMessage "Attention : WIN_CA_BUNDLE defines but file is unavailable : $caBundlePath"
+    }
+}
 
 # Checking variables
 $variableNames = @("PARENT_PYTHON_HOME", "PARENT_PYTHON_EXE", "VENV_PYTHON_DIR", "VENV_PYTHON_EXE")
@@ -169,6 +210,11 @@ Set-Location -Path $env:APPLICATION_HOME
 # console defaults to cp1252/cp850 on Windows.
 $env:PYTHONUTF8 = "1"
 $env:PYTHONIOENCODING = "utf-8"
+
+# Force le mode non-bufferise : sans cela, les print() Python restent en
+# memoire et n'apparaissent qu'a la fin du traitement (ou dans le desordre
+# par rapport aux logs) quand la sortie n'est pas un vrai terminal.
+$env:PYTHONUNBUFFERED = "1"
 
 LogMessage "Executing application : $applicationPath"
 & $python $applicationPath

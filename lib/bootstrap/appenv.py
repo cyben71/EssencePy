@@ -1,4 +1,4 @@
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 import os
 import platform
@@ -6,6 +6,8 @@ import re
 from datetime import datetime
 from typing import Optional, Dict
 from pathlib import Path
+import shutil
+
 
 
 class AppEnv:
@@ -191,6 +193,112 @@ class AppEnv:
             print(f"Folder {location} not created")
             return False
 
+    @staticmethod
+    def mv_file(source: str, destination: str) -> bool:
+        """
+        Move a file to a given destination (equivalent to `mv` on Linux).
+        If the destination folder tree does not exist, it is created automatically.
+
+        Args:
+            source (str): Path of the file to move.
+            destination (str): Destination path (file or folder).
+                - If `destination` ends with a folder separator or matches
+                an existing folder, the file is moved into that folder,
+                keeping its original name.
+                - Otherwise, `destination` is treated as the full path of
+                the destination file (allows renaming on the fly).
+
+        Returns:
+            bool: True if the move succeeded, False otherwise.
+
+        Example:
+            epy.appenv.mv_file("data/report.csv", "archive/2026/report.csv")
+            epy.appenv.mv_file("data/report.csv", "archive/2026/")
+        """
+        if not AppEnv.is_file_exists(source):
+            print(f"File {source} is not found or is not available")
+            return False
+
+        dest_path = Path(destination)
+
+        # Determine whether the destination should be treated as a folder
+        # (existing folder, or trailing separator notation)
+        is_dir_target = destination.endswith(("/", "\\")) or dest_path.is_dir()
+
+        if is_dir_target:
+            target_dir = dest_path
+            target_file = target_dir / Path(source).name
+        else:
+            target_dir = dest_path.parent
+            target_file = dest_path
+
+        # Create the missing folder tree by reusing AppEnv.mkdir
+        if str(target_dir) and not AppEnv.is_folder_exists(str(target_dir)):
+            if not AppEnv.mkdir(str(target_dir)):
+                return False
+
+        try:
+            shutil.move(source, str(target_file))
+            print(f"File {source} successfully moved to {target_file}")
+            return True
+        except Exception as e:
+            print(f"File {source} not moved: {e}")
+            return False
+
+
+    @staticmethod
+    def cp_file(source: str, destination: str) -> bool:
+        """
+        Copy a file to a given destination (equivalent to `cp` on Linux).
+        If the destination folder tree does not exist, it is created automatically.
+
+        Args:
+            source (str): Path of the file to copy.
+            destination (str): Destination path (file or folder).
+                - If `destination` ends with a folder separator or matches
+                an existing folder, the file is copied into that folder,
+                keeping its original name.
+                - Otherwise, `destination` is treated as the full path of
+                the destination file (allows renaming on the fly).
+
+        Returns:
+            bool: True if the copy succeeded, False otherwise.
+
+        Example:
+            epy.appenv.cp_file("data/report.csv", "backup/2026/report.csv")
+            epy.appenv.cp_file("data/report.csv", "backup/2026/")
+        """
+        if not AppEnv.is_file_exists(source):
+            print(f"File {source} is not found or is not available")
+            return False
+
+        dest_path = Path(destination)
+
+        # Determine whether the destination should be treated as a folder
+        # (existing folder, or trailing separator notation)
+        is_dir_target = destination.endswith(("/", "\\")) or dest_path.is_dir()
+
+        if is_dir_target:
+            target_dir = dest_path
+            target_file = target_dir / Path(source).name
+        else:
+            target_dir = dest_path.parent
+            target_file = dest_path
+
+        # Create the missing folder tree by reusing AppEnv.mkdir
+        if str(target_dir) and not AppEnv.is_folder_exists(str(target_dir)):
+            if not AppEnv.mkdir(str(target_dir)):
+                return False
+
+        try:
+            # copy2 preserves metadata (timestamps, permissions), like cp -p
+            shutil.copy2(source, str(target_file))
+            print(f"File {source} successfully copied to {target_file}")
+            return True
+        except Exception as e:
+            print(f"File {source} not copied: {e}")
+            return False
+    
     ######################################
     ##### PRIVATE METHOD & FUNCTIONS #####
     ######################################

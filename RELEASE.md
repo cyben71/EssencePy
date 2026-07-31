@@ -10,13 +10,15 @@ Add a new class in EPY for generating technical documentation of current project
 2) Under './lib/bootstrap/' directory:
    > Enhancing `CfgProperties` class by handling dotenv file (version 1.1.0)
    > Enhancing `CfgYaml` class by handling dotenv file (version 1.1.0)
+   > Adding new functions to copy and move files in `AppEnv` class (version 1.0.3)
 3) Under './notebooks/' directory:
    + Adding explainations for environment variable resolution order
 4) Under './docs/' directory:
    + Adding document for deploying Python without administrator's rights 
 5) Under './scripts/' directory:
    > Translating comments (FR -> US) on all powershell scripts
-   > Enhancing 'app-start.ps1' to be called by a run.bat regardless of where the script was called from (batch file, scheduler, etc.) 
+   > Enhancing 'app-start.ps1' to be called by a run.bat regardless of where the script was called from (batch file, scheduler, etc.)
+   > Enhancing powershell scripts for better displaying and handling CA_BUNDLE file for corporate SSL inspection proxies (ex: Zscaler)
    + Adding 'run.bat' script which can be used by Windows scheduler
 ```
 

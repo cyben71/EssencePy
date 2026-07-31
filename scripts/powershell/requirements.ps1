@@ -29,6 +29,23 @@ function LogMessage {
 ### SETTINGS ###
 ################
 
+# ------------------------------------------------------------------------ #
+# Encoding: forces the console to decode using UTF-8, regardless of the
+# terminal used (cmd, native PowerShell, VSCode). Without this,
+# accented characters/emojis written by Python (PYTHONUTF8=1, below)
+# are decoded incorrectly by the console -> mojibake.
+# ------------------------------------------------------------------------ #
+chcp 65001 > $null
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
+# ------------------------------------------------------------------------ #
+# Prevents the "error" formatting (red text) that PowerShell 7.3+ applies
+# by default to any native command writing to stderr with a non-zero
+# exit code (Python tracebacks trigger this behavior).
+# Has no effect on PowerShell 5.1, which does not recognize this variable.
+# ------------------------------------------------------------------------ #
+$PSNativeCommandUseErrorActionPreference = $false
+
 # Finding APPLICATION_HOME by going up folders until we find bootstrap.py in lib/bootstrap/ directory
 $currentDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 while ($true) {
@@ -92,6 +109,29 @@ Get-Content $CONF_FILE | ForEach-Object {
 Set-Variable -Name "VENV_PYTHON_DIR" -Value $VENV_PYTHON_DIR
 Set-Variable -Name "VENV_PYTHON_EXE" -Value $PARENT_PYTHON_EXE
 
+# ------------------------------------------------------------------------ #
+# CA bundle optionnel : si le projet definit WIN_CA_BUNDLE dans conf/env.conf
+# (chemin absolu, ou relatif a APPLICATION_HOME) et que le fichier existe,
+# on l'utilise comme CA additionnel pour pip/Python (SSL_CERT_FILE /
+# REQUESTS_CA_BUNDLE / PIP_CERT). Reste inactif si la variable n'est pas
+# definie : ne concerne que les projets qui en ont besoin (ex: proxy
+# d'inspection SSL d'entreprise) sans rien imposer aux autres.
+# ------------------------------------------------------------------------ #
+if ($CA_BUNDLE) {
+    $caBundlePath = $CA_BUNDLE
+    if (-not [System.IO.Path]::IsPathRooted($caBundlePath)) {
+        $caBundlePath = Join-Path $env:APPLICATION_HOME $caBundlePath
+    }
+    if (Test-Path -Path $caBundlePath -PathType Leaf) {
+        $env:SSL_CERT_FILE = $caBundlePath
+        $env:REQUESTS_CA_BUNDLE = $caBundlePath
+        $env:PIP_CERT = $caBundlePath
+        LogMessage "CA bundle applique : $caBundlePath"
+    } else {
+        LogMessage "Attention : WIN_CA_BUNDLE defini mais fichier introuvable : $caBundlePath"
+    }
+}
+
 # Checking variables
 $variableNames = @("PARENT_PYTHON_HOME", "PARENT_PYTHON_EXE", "VENV_PYTHON_DIR", "VENV_PYTHON_EXE")
 
@@ -131,7 +171,7 @@ if (-not (Test-Path -Path $python_venv -PathType Leaf)) {
         LogMessage "Python parent found : $python_parent"
         $python_folder = $PARENT_PYTHON_HOME
         $python = $python_parent
-        $pip_install_opts = "--user"
+        # $pip_install_opts = "--user"
     }
 } else {
     LogMessage "Virtual python environment detected : $python_venv"

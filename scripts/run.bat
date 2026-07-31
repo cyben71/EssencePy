@@ -59,14 +59,28 @@ if not exist "%PS_SCRIPT%" (
     exit /b 1
 )
 
-REM ==================================================================== #
+REM =================================================================== #
 REM  Run                                                                #
-REM ==================================================================== #
+REM  -> Start-Transcript keeps the process attached DIRECTLY            #
+REM     to the console (unlike a pipe/Tee-Objects)                      #
+REM     An existing prompt can now appears immediately.                 #
+REM     The transcript still records a complete copy in the log file.   #
+REM =================================================================== #
 echo [%date% %time%] Starting - APPLICATION_HOME=%APPLICATION_HOME% - Script=%PYTHON_SCRIPT% >> "%LOG_FILE%"
+echo ============================================================
+echo  Lancement de %PYTHON_SCRIPT%
+echo  Log complet : %LOG_FILE%
+echo ============================================================
+echo.
 
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%PS_SCRIPT%" "%PYTHON_SCRIPT%" >> "%LOG_FILE%" 2>&1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command ^
+    "Start-Transcript -Path '%LOG_FILE%' -Append | Out-Null; & '%PS_SCRIPT%' '%PYTHON_SCRIPT%'; $ec = $LASTEXITCODE; Stop-Transcript | Out-Null; exit $ec"
 set "EXIT_CODE=%ERRORLEVEL%"
 
+echo.
+echo ============================================================
+echo  Termine - code retour : %EXIT_CODE%
+echo ============================================================
 echo [%date% %time%] Done - exit code: %EXIT_CODE% >> "%LOG_FILE%"
 
 endlocal

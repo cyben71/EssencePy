@@ -38,6 +38,23 @@ function LogMessage {
 ### SETTINGS ###
 ################
 
+# ------------------------------------------------------------------------ #
+# Encoding: forces the console to decode using UTF-8, regardless of the
+# terminal used (cmd, native PowerShell, VSCode). Without this,
+# accented characters/emojis written by Python (PYTHONUTF8=1, below)
+# are decoded incorrectly by the console -> mojibake.
+# ------------------------------------------------------------------------ #
+chcp 65001 > $null
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
+# ------------------------------------------------------------------------ #
+# Prevents the "error" formatting (red text) that PowerShell 7.3+ applies
+# by default to any native command writing to stderr with a non-zero
+# exit code (Python tracebacks trigger this behavior).
+# Has no effect on PowerShell 5.1, which does not recognize this variable.
+# ------------------------------------------------------------------------ #
+$PSNativeCommandUseErrorActionPreference = $false
+
 # Finding APPLICATION_HOME by going up folders until we find bootstrap.py in lib/bootstrap/ directory
 $currentDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 while ($true) {
