@@ -5,7 +5,7 @@
 
 ## Module `lib.bootstrap.appenv`
 
-*Source* : `/home/bgonzalez/EssencePy/lib/bootstrap/appenv.py`
+*Source* : `C:\cyben71\EssencePy\lib\bootstrap\appenv.py`
 
 
 ### Class `AppEnv`
@@ -58,10 +58,15 @@ Calling load() or relaunching init_env() always produces a fresh, complete snaps
 - **get_system() -> str**
 
     Return type of system.
-- **get_username() -> str**
+- **get_username()**
 
-    Return username.
-    You can bypass current username by setting your own USERNAME in a .env file (USERNAME for Windows / USER for Linux)
+    Retrieves the name of the current user logged into the system.
+    This function is cross-platform and works on Linux, Windows, and macOS.
+
+
+    **Returns**
+
+    - str: The username of the current user.
 - **is_file_exists(location: str) -> bool**
 
     Check if a file exists at specified location.
@@ -131,9 +136,6 @@ Calling load() or relaunching init_env() always produces a fresh, complete snaps
     epy.appenv.load()
     print(epy.appenv.loaded_vars)
     ```
-- **mask(self, text: Optional[str]) -> Optional[str]**
-
-    Masque username/hostname réels dans `text`, uniquement si DEV_MODE=True.
 - **mkdir(location: str) -> bool**
 
     Create a folder at specified location.
@@ -197,7 +199,7 @@ Calling load() or relaunching init_env() always produces a fresh, complete snaps
 
 ## Module `lib.bootstrap.calendar`
 
-*Source* : `/home/bgonzalez/EssencePy/lib/bootstrap/calendar.py`
+*Source* : `C:\cyben71\EssencePy\lib\bootstrap\calendar.py`
 
 
 ### Class `Calendar`
@@ -211,23 +213,23 @@ Provides:
 - next month information
 - period boundaries
 
-- **get_current_date(pattern: Optional[str] = None) -> str**
+- **get_current_date(pattern: str | None = None) -> str**
 - **get_current_datetime() -> datetime.datetime**
-- **get_current_period_info(reference_date: Optional[datetime.datetime] = None) -> Dict[str, str]**
-- **get_current_time(pattern: Optional[str] = None) -> str**
-- **get_next_month(pattern: Optional[str] = None, reference_date: Optional[datetime.datetime] = None) -> str**
-- **get_next_month_first_day(pattern: Optional[str] = None, reference_date: Optional[datetime.datetime] = None) -> str**
-- **get_next_month_last_day(pattern: Optional[str] = None, reference_date: Optional[datetime.datetime] = None) -> str**
-- **get_next_period_info(reference_date: Optional[datetime.datetime] = None) -> Dict[str, str]**
-- **get_previous_month(pattern: Optional[str] = None, reference_date: Optional[datetime.datetime] = None) -> str**
-- **get_previous_month_first_day(pattern: Optional[str] = None, reference_date: Optional[datetime.datetime] = None) -> str**
-- **get_previous_month_last_day(pattern: Optional[str] = None, reference_date: Optional[datetime.datetime] = None) -> str**
-- **get_previous_period_info(reference_date: Optional[datetime.datetime] = None) -> Dict[str, str]**
-- **get_previous_year(pattern: Optional[str] = None, reference_date: Optional[datetime.datetime] = None) -> str**
+- **get_current_period_info(reference_date: datetime.datetime | None = None) -> Dict[str, str]**
+- **get_current_time(pattern: str | None = None) -> str**
+- **get_next_month(pattern: str | None = None, reference_date: datetime.datetime | None = None) -> str**
+- **get_next_month_first_day(pattern: str | None = None, reference_date: datetime.datetime | None = None) -> str**
+- **get_next_month_last_day(pattern: str | None = None, reference_date: datetime.datetime | None = None) -> str**
+- **get_next_period_info(reference_date: datetime.datetime | None = None) -> Dict[str, str]**
+- **get_previous_month(pattern: str | None = None, reference_date: datetime.datetime | None = None) -> str**
+- **get_previous_month_first_day(pattern: str | None = None, reference_date: datetime.datetime | None = None) -> str**
+- **get_previous_month_last_day(pattern: str | None = None, reference_date: datetime.datetime | None = None) -> str**
+- **get_previous_period_info(reference_date: datetime.datetime | None = None) -> Dict[str, str]**
+- **get_previous_year(pattern: str | None = None, reference_date: datetime.datetime | None = None) -> str**
 
 ## Module `lib.bootstrap.cfgproperties`
 
-*Source* : `/home/bgonzalez/EssencePy/lib/bootstrap/cfgproperties.py`
+*Source* : `C:\cyben71\EssencePy\lib\bootstrap\cfgproperties.py`
 
 
 ### Class `ConfigProperties`
@@ -245,7 +247,7 @@ Environment variable resolution order for ${VAR} placeholders:
 2. OS session environment variables (os.environ) as fallback
 3. Unresolved placeholder kept as-is
 
-- **get(self, key: str, default: Optional[str] = None, strip_values: bool = True) -> Any**
+- **get(self, key: str, default: str | None = None, strip_values: bool = True) -> Any**
 
     Getting value from a specified key with handling of environment variables and empty string stripping.
 
@@ -265,7 +267,7 @@ Environment variable resolution order for ${VAR} placeholders:
 
 ## Module `lib.bootstrap.cfgyaml`
 
-*Source* : `/home/bgonzalez/EssencePy/lib/bootstrap/cfgyaml.py`
+*Source* : `C:\cyben71\EssencePy\lib\bootstrap\cfgyaml.py`
 
 
 ### Class `ConfigYaml`
@@ -280,7 +282,7 @@ Environment variable resolution order for ${VAR} placeholders:
 2. OS session environment variables (os.environ) as fallback
 3. Unresolved placeholder kept as-is
 
-- **get(self, key: str, default: Optional[str] = None, root: Optional[Dict[str, Any]] = None, strip_values: Optional[bool] = None) -> Any**
+- **get(self, key: str, default: str | None = None, root: Dict[str, Any] | None = None, strip_values: bool | None = None) -> Any**
 
     Get value from a specified key coming from a yaml file.
     Can handled:
@@ -304,7 +306,7 @@ Environment variable resolution order for ${VAR} placeholders:
 
 ## Module `lib.bootstrap.context`
 
-*Source* : `/home/bgonzalez/EssencePy/lib/bootstrap/context.py`
+*Source* : `C:\cyben71\EssencePy\lib\bootstrap\context.py`
 
 
 ### Class `Context`
@@ -312,7 +314,7 @@ Environment variable resolution order for ${VAR} placeholders:
 Allow to display properly modules or main variables into a context called 'epy'.
 Usefull for IDE like Vscode.
 
-- **load_class(self, module_name: str, class_name: str = '', args: List[Any] = [], *, cls_type: Optional[Type[~T]] = None) -> Union[~T, Any]**
+- **load_class(self, module_name: str, class_name: str = '', args: List[Any] = [], *, cls_type: Type[~T] | None = None) -> ~T | Any**
 
     Allow to load and instanciate your own python class (outside of lib/bootstrap).
 
@@ -345,7 +347,7 @@ Usefull for IDE like Vscode.
 
 ## Module `lib.bootstrap.docgenerator`
 
-*Source* : `/home/bgonzalez/EssencePy/lib/bootstrap/docgenerator.py`
+*Source* : `C:\cyben71\EssencePy\lib\bootstrap\docgenerator.py`
 
 
 ### Class `DocGenerator`
@@ -390,7 +392,7 @@ The output is a Markdown file.
 
 ## Module `lib.bootstrap.logger`
 
-*Source* : `/home/bgonzalez/EssencePy/lib/bootstrap/logger.py`
+*Source* : `C:\cyben71\EssencePy\lib\bootstrap\logger.py`
 
 
 ### Class `Logger`
@@ -507,7 +509,7 @@ keeping up to backup_count previous files.
 
 ## Module `my_dummy_class`
 
-*Source* : `/home/bgonzalez/EssencePy/lib/my_dummy_class.py`
+*Source* : `C:\cyben71\EssencePy\lib\my_dummy_class.py`
 
 
 ### Class `Dummy`

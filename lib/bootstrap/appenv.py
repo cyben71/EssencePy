@@ -126,22 +126,17 @@ class AppEnv:
             return os.environ["HOSTNAME"]
         else:
             return platform.node()
-        
-    @staticmethod
-    def get_username() -> str:
-        """
-        Return username.
-        You can bypass current username by setting your own USERNAME in a .env file (USERNAME for Windows / USER for Linux)
-        """
-        username:str  = ""
-        # default linux user variable is USER  ()
-        if platform.system().upper() == "LINUX" and "USER" in os.environ.keys() or "USERNAME" in os.environ.keys():
-           username =  os.environ["USER"]
 
-        # default windows user variable is USER  
-        if platform.system().upper() == "WINDOWS" and "USERNAME" in os.environ.keys() or "USER" in os.environ.keys():
-            username =  os.environ["USERNAME"]
-        return username
+    @staticmethod
+    def get_username():
+        """
+        Retrieves the name of the current user logged into the system.
+        This function is cross-platform and works on Linux, Windows, and macOS.
+        You can bypass current username by setting your own USER or USERNAME variable with a .env file
+        Returns:
+            str: The username of the current user.
+        """
+        return getpass.getuser()
 
     @staticmethod
     def is_folder_exists(location: str) -> bool:
@@ -319,25 +314,6 @@ class AppEnv:
         """Chemin absolu du .env chargé, ou None si aucun trouvé."""
         return self._dotenv_path
 
-    @property
-    def dev_mode(self) -> bool:
-        """True si DEV_MODE=True (insensible à la casse) est défini dans le .env."""
-        return os.environ.get("DEV_MODE", "False").strip().lower() == "true"
-
-    def mask(self, text: Optional[str]) -> Optional[str]:
-        """Masque username/hostname réels dans `text`, uniquement si DEV_MODE=True."""
-        if not text or not self.dev_mode:
-            return text
-        fake_username = os.environ.get("USERNAME", "Anonymous_User")
-        fake_hostname = os.environ.get("HOSTNAME", "Anonymous_Host")
-        masked = text
-        real_username = self._get_real_username()
-        real_hostname = self._get_real_hostname()
-        if real_username:
-            masked = re.sub(re.escape(real_username), fake_username, masked, flags=re.IGNORECASE)
-        if real_hostname:
-            masked = re.sub(re.escape(real_hostname), fake_hostname, masked, flags=re.IGNORECASE)
-        return masked
     
     ######################################
     ##### PRIVATE METHOD & FUNCTIONS #####
@@ -451,21 +427,3 @@ class AppEnv:
             context_module = sys.modules.get("lib.bootstrap.context")
             if context_module and hasattr(context_module, "context"):
                 context_module.context.CFGENV_FILE = self._dotenv_path
-
-    @staticmethod
-    def _get_real_username() -> str:
-        for getter in (os.getlogin, getpass.getuser):
-            try:
-                value = getter()
-                if value:
-                    return value
-            except Exception:
-                continue
-        return ""
-
-    @staticmethod
-    def _get_real_hostname() -> str:
-        try:
-            return platform.node() or ""
-        except Exception:
-            return ""

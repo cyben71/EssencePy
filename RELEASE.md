@@ -10,8 +10,7 @@ Add a new class in EPY for generating technical documentation of current project
 2) Under './lib/bootstrap/' directory:
    > `AppEnv` class: Dotenv file handling (version 1.1.0)
    > `AppEnv` class: New functions to copy/move files (version 1.1.0)
-   > `AppEnv` class: New functions to enable DEV_MODE (version 1.1.0)
-   > `init_code` class: Enhancing displaying with DEV_MODE and .env file (version 1.1.0)
+   > `init_code` class: Displaying .env file (version 1.1.0)
    + Adding new `Calendar` class to handle dates and time periods (version 1.0.0)
    > Fix `Logger` class to use calendar instead of appenv class when creating log file (version 2.0.1)
 3) Under './notebooks/' directory:
