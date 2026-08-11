@@ -1,14 +1,20 @@
-__version__ = "1.0.3"
+__version__ = "1.1.0"
 
 import os
+import sys
+import getpass
 import platform
 import re
-from datetime import datetime
+# from datetime import datetime
 from typing import Optional, Dict
 from pathlib import Path
 import shutil
 
-
+try:
+    from dotenv import dotenv_values, find_dotenv
+    _DOTENV_AVAILABLE = True
+except ImportError:
+    _DOTENV_AVAILABLE = False
 
 class AppEnv:
     """
@@ -35,6 +41,7 @@ class AppEnv:
     def __init__(self):
         """Constructor — triggers a full environment load immediately."""
         self._loaded_vars: Dict[str, str] = {}
+        self._dotenv_path: Optional[str] = None
         self.load()
 
     #####################################
@@ -54,14 +61,30 @@ class AppEnv:
         """
         return self._loaded_vars
 
+    # def load(self) -> Dict[str, str]:
     def load(self) -> Dict[str, str]:
         """
         Load (or reload) all environment variables into os.environ.
 
         Always performs a full reload — existing values in os.environ
-        are overwritten if a newer value is found in the profile files.
-        Call this after modifying ~/.bash_env or any shell profile,
-        without restarting the kernel.
+        are overwritten if a newer value is found in the profile files
+        and/or in the .env file.
+
+        Loading order (each step can overwrite the previous one):
+            1. OS baseline   : full os.environ snapshot (Windows) or
+                               ~/.bash_env, ~/.bashrc, ~/.bash_profile,
+                               ~/.profile (Linux).
+            2. .env file     : loaded LAST, values always win over the
+                               OS baseline above (override enabled).
+
+        Call this after modifying ~/.bash_env, any shell profile, or your
+        .env file, without restarting the kernel.
+
+        Args:
+            The .env file is auto-discovered by walking up
+            from the current working directory (same principle as
+            locating APPLICATION_HOME). If no .env file is found,
+            this step is silently skipped.
 
         Returns:
             Dict[str, str]: Full snapshot of loaded variables.
@@ -70,7 +93,7 @@ class AppEnv:
             # Initial load (called automatically at init)
             epy = init_env()
 
-            # After modifying ~/.bash_env in your terminal:
+            # After modifying ~/.bash_env or your .env file:
             epy.appenv.load()
             print(epy.appenv.loaded_vars)
         """
@@ -81,6 +104,10 @@ class AppEnv:
         else:
             self._load_linux()
 
+        # .env is always loaded last so its values take precedence over
+        # anything already present in os.environ (OS vars, shell profile vars).
+        self._load_dotenv()
+
         return self._loaded_vars
 
     @staticmethod
@@ -90,42 +117,31 @@ class AppEnv:
 
     @staticmethod
     def get_hostname() -> str:
-        """Return hostname."""
-        return platform.node()
-
+        """
+        Return hostname.
+        You can bypass device hostname by setting your own HOSTNAME variable with a .env file
+        """
+        # if os.environ["HOSTNAME"] is not None:
+        if "HOSTNAME" in os.environ.keys():
+            return os.environ["HOSTNAME"]
+        else:
+            return platform.node()
+        
     @staticmethod
-    def get_current_date(pattern: Optional[str] = None) -> str:
+    def get_username() -> str:
         """
-        Return current date (default format: %Y-%m-%d).
-
-        Args:
-            pattern (str, optional): Pattern for displaying date.
-
-        Returns:
-            str: Current date with chosen pattern.
-
-        Example:
-            date1 = epy.appenv.get_current_date(pattern='%Y-%m-%d')
-            date2 = epy.appenv.get_current_date(pattern='%d/%m/%Y')
+        Return username.
+        You can bypass current username by setting your own USERNAME in a .env file (USERNAME for Windows / USER for Linux)
         """
-        if pattern is None:
-            pattern = "%Y-%m-%d"
-        return datetime.now().strftime(pattern)
+        username:str  = ""
+        # default linux user variable is USER  ()
+        if platform.system().upper() == "LINUX" and "USER" in os.environ.keys() or "USERNAME" in os.environ.keys():
+           username =  os.environ["USER"]
 
-    @staticmethod
-    def get_current_time(pattern: Optional[str] = None) -> str:
-        """
-        Return current time (default format: %H:%M:%S).
-
-        Args:
-            pattern (str, optional): Pattern for displaying time.
-
-        Returns:
-            str: Current time with chosen pattern.
-        """
-        if pattern is None:
-            pattern = "%H:%M:%S"
-        return datetime.now().strftime(pattern)
+        # default windows user variable is USER  
+        if platform.system().upper() == "WINDOWS" and "USERNAME" in os.environ.keys() or "USER" in os.environ.keys():
+            username =  os.environ["USERNAME"]
+        return username
 
     @staticmethod
     def is_folder_exists(location: str) -> bool:
@@ -245,7 +261,6 @@ class AppEnv:
             print(f"File {source} not moved: {e}")
             return False
 
-
     @staticmethod
     def cp_file(source: str, destination: str) -> bool:
         """
@@ -298,6 +313,31 @@ class AppEnv:
         except Exception as e:
             print(f"File {source} not copied: {e}")
             return False
+    
+    @property
+    def dotenv_path(self) -> Optional[str]:
+        """Chemin absolu du .env chargé, ou None si aucun trouvé."""
+        return self._dotenv_path
+
+    @property
+    def dev_mode(self) -> bool:
+        """True si DEV_MODE=True (insensible à la casse) est défini dans le .env."""
+        return os.environ.get("DEV_MODE", "False").strip().lower() == "true"
+
+    def mask(self, text: Optional[str]) -> Optional[str]:
+        """Masque username/hostname réels dans `text`, uniquement si DEV_MODE=True."""
+        if not text or not self.dev_mode:
+            return text
+        fake_username = os.environ.get("USERNAME", "Anonymous_User")
+        fake_hostname = os.environ.get("HOSTNAME", "Anonymous_Host")
+        masked = text
+        real_username = self._get_real_username()
+        real_hostname = self._get_real_hostname()
+        if real_username:
+            masked = re.sub(re.escape(real_username), fake_username, masked, flags=re.IGNORECASE)
+        if real_hostname:
+            masked = re.sub(re.escape(real_hostname), fake_hostname, masked, flags=re.IGNORECASE)
+        return masked
     
     ######################################
     ##### PRIVATE METHOD & FUNCTIONS #####
@@ -373,3 +413,59 @@ class AppEnv:
         if key:
             os.environ[key] = value
             self._loaded_vars[key] = value
+
+    def _load_dotenv(self) -> None:
+        """
+        Load a ".env" file and inject ALL its variables into os.environ,
+        UNCONDITIONALLY overwriting any existing value (OS env var, shell
+        profile var, previously loaded .env, ...).
+
+        Works identically on Windows and Linux (unlike _load_windows /
+        _load_linux above), so behaviour is guaranteed to be the same in
+        VS Code, JupyterLab, a plain terminal, or a systemd service.
+
+        Lookup order for the .env file:
+            Auto-discovery: starting from the current working directory,
+            walk up parent folders until a ".env" file is found
+            (delegated to python-dotenv's find_dotenv(usecwd=True)).
+
+        If python-dotenv is not installed, or no .env file can be found,
+        this step is silently skipped (no exception raised).
+
+        Args:
+            dotenv_path (str, optional): Explicit path to a .env file.
+        """
+        self._dotenv_path = None
+
+        if _DOTENV_AVAILABLE:
+            path = find_dotenv(filename=".env", usecwd=True)
+            if not path or not Path(path).is_file():
+                return
+            else:
+                self._dotenv_path = path
+                for key, value in dotenv_values(path).items():
+                    if value is not None:
+                        self._inject(key, value)
+
+            # Publie le chemin résolu sur context.CFGENV_FILE (même pattern que ConfigYaml)
+            context_module = sys.modules.get("lib.bootstrap.context")
+            if context_module and hasattr(context_module, "context"):
+                context_module.context.CFGENV_FILE = self._dotenv_path
+
+    @staticmethod
+    def _get_real_username() -> str:
+        for getter in (os.getlogin, getpass.getuser):
+            try:
+                value = getter()
+                if value:
+                    return value
+            except Exception:
+                continue
+        return ""
+
+    @staticmethod
+    def _get_real_hostname() -> str:
+        try:
+            return platform.node() or ""
+        except Exception:
+            return ""

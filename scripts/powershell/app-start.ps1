@@ -113,7 +113,7 @@ Set-Variable -Name "VENV_PYTHON_DIR" -Value $VENV_PYTHON_DIR
 Set-Variable -Name "VENV_PYTHON_EXE" -Value $PARENT_PYTHON_EXE
 
 # ------------------------------------------------------------------------ #
-# Optional CA bundle file: if the project defines a WIN_CA_BUNDLE var in conf/env.conf
+# Optional CA bundle file: if the project defines a CA_BUNDLE var in conf/env.conf
 # (absolute path, or path relative to APPLICATION_HOME) and the file exists,
 # it is used as an additional CA for Python (SSL_CERT_FILE /
 # REQUESTS_CA_BUNDLE). 
@@ -132,7 +132,7 @@ if ($CA_BUNDLE) {
         $env:REQUESTS_CA_BUNDLE = $caBundlePath
         LogMessage "CA bundle loaded : $caBundlePath"
     } else {
-        LogMessage "Attention : WIN_CA_BUNDLE defines but file is unavailable : $caBundlePath"
+        LogMessage "Attention : CA_BUNDLE defines but file is unavailable : $caBundlePath"
     }
 }
 

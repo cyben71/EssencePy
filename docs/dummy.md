@@ -5,7 +5,7 @@
 
 ## Module `my_dummy_class`
 
-*Source* : `C:\cyben71\PYTHON_PROJECT\EssencePy\lib\my_dummy_class.py`
+*Source* : `/home/bgonzalez/EssencePy/lib/my_dummy_class.py`
 
 
 ### Class `Dummy`

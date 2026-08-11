@@ -5,7 +5,7 @@
 
 ## Module `lib.bootstrap.appenv`
 
-*Source* : `C:\cyben71\PYTHON_PROJECT\EssencePy\lib\bootstrap\appenv.py`
+*Source* : `/home/bgonzalez/EssencePy/lib/bootstrap/appenv.py`
 
 
 ### Class `AppEnv`
@@ -21,50 +21,47 @@ On Windows: captures full os.environ snapshot (already populated by the OS).
 
 Calling load() or relaunching init_env() always produces a fresh, complete snapshot.
 
-- **get_current_date(pattern: Optional[str] = None) -> str**
+- **cp_file(source: str, destination: str) -> bool**
 
-    Return current date (default format: %Y-%m-%d).
+    Copy a file to a given destination (equivalent to `cp` on Linux).
+    If the destination folder tree does not exist, it is created automatically.
 
+    - If `destination` ends with a folder separator or matches
+    an existing folder, the file is copied into that folder,
+    keeping its original name.
+    - Otherwise, `destination` is treated as the full path of
+    the destination file (allows renaming on the fly).
 
 
     **Arguments**
 
     | Name | Description |
     |------|-------------|
-    | `pattern (str, optional)` | Pattern for displaying date. |
+    | `source (str)` | Path of the file to copy. |
+    | `destination (str)` | Destination path (file or folder). |
 
 
     **Returns**
 
-    - str: Current date with chosen pattern.
+    - bool: True if the copy succeeded, False otherwise.
 
     **Example**
 
     ```python
-    date1 = epy.appenv.get_current_date(pattern='%Y-%m-%d')
-    date2 = epy.appenv.get_current_date(pattern='%d/%m/%Y')
+    epy.appenv.cp_file("data/report.csv", "backup/2026/report.csv")
+    epy.appenv.cp_file("data/report.csv", "backup/2026/")
     ```
-- **get_current_time(pattern: Optional[str] = None) -> str**
-
-    Return current time (default format: %H:%M:%S).
-
-
-
-    **Arguments**
-
-    | Name | Description |
-    |------|-------------|
-    | `pattern (str, optional)` | Pattern for displaying time. |
-
-    **Returns**
-
-    - str: Current time with chosen pattern.
 - **get_hostname() -> str**
 
     Return hostname.
+    You can bypass device hostname by setting your own HOSTNAME variable with a .env file
 - **get_system() -> str**
 
     Return type of system.
+- **get_username() -> str**
+
+    Return username.
+    You can bypass current username by setting your own USERNAME in a .env file (USERNAME for Windows / USER for Linux)
 - **is_file_exists(location: str) -> bool**
 
     Check if a file exists at specified location.
@@ -100,9 +97,23 @@ Calling load() or relaunching init_env() always produces a fresh, complete snaps
     Load (or reload) all environment variables into os.environ.
 
     Always performs a full reload — existing values in os.environ
-    are overwritten if a newer value is found in the profile files.
-    Call this after modifying ~/.bash_env or any shell profile,
-    without restarting the kernel.
+    are overwritten if a newer value is found in the profile files
+    and/or in the .env file.
+
+    Loading order (each step can overwrite the previous one):
+    1. OS baseline   : full os.environ snapshot (Windows) or
+    ~/.bash_env, ~/.bashrc, ~/.bash_profile,
+    ~/.profile (Linux).
+    2. .env file     : loaded LAST, values always win over the
+    OS baseline above (override enabled).
+
+    Call this after modifying ~/.bash_env, any shell profile, or your
+    .env file, without restarting the kernel.
+
+    The .env file is auto-discovered by walking up
+    from the current working directory (same principle as
+    locating APPLICATION_HOME). If no .env file is found,
+    this step is silently skipped.
 
 
 
@@ -116,10 +127,13 @@ Calling load() or relaunching init_env() always produces a fresh, complete snaps
     # Initial load (called automatically at init)
     epy = init_env()
 
-    # After modifying ~/.bash_env in your terminal:
+    # After modifying ~/.bash_env or your .env file:
     epy.appenv.load()
     print(epy.appenv.loaded_vars)
     ```
+- **mask(self, text: Optional[str]) -> Optional[str]**
+
+    Masque username/hostname réels dans `text`, uniquement si DEV_MODE=True.
 - **mkdir(location: str) -> bool**
 
     Create a folder at specified location.
@@ -135,6 +149,36 @@ Calling load() or relaunching init_env() always produces a fresh, complete snaps
     **Returns**
 
     - bool: True if successfully created, False otherwise.
+- **mv_file(source: str, destination: str) -> bool**
+
+    Move a file to a given destination (equivalent to `mv` on Linux).
+    If the destination folder tree does not exist, it is created automatically.
+
+    - If `destination` ends with a folder separator or matches
+    an existing folder, the file is moved into that folder,
+    keeping its original name.
+    - Otherwise, `destination` is treated as the full path of
+    the destination file (allows renaming on the fly).
+
+
+    **Arguments**
+
+    | Name | Description |
+    |------|-------------|
+    | `source (str)` | Path of the file to move. |
+    | `destination (str)` | Destination path (file or folder). |
+
+
+    **Returns**
+
+    - bool: True if the move succeeded, False otherwise.
+
+    **Example**
+
+    ```python
+    epy.appenv.mv_file("data/report.csv", "archive/2026/report.csv")
+    epy.appenv.mv_file("data/report.csv", "archive/2026/")
+    ```
 - **rm_file(location: str) -> bool**
 
     Delete a file if it exists.
@@ -151,9 +195,39 @@ Calling load() or relaunching init_env() always produces a fresh, complete snaps
 
     - bool: True if successfully deleted, False otherwise.
 
+## Module `lib.bootstrap.calendar`
+
+*Source* : `/home/bgonzalez/EssencePy/lib/bootstrap/calendar.py`
+
+
+### Class `Calendar`
+
+Date and period helper utilities.
+
+Provides:
+- current date/time
+- current month information
+- previous month information
+- next month information
+- period boundaries
+
+- **get_current_date(pattern: Optional[str] = None) -> str**
+- **get_current_datetime() -> datetime.datetime**
+- **get_current_period_info(reference_date: Optional[datetime.datetime] = None) -> Dict[str, str]**
+- **get_current_time(pattern: Optional[str] = None) -> str**
+- **get_next_month(pattern: Optional[str] = None, reference_date: Optional[datetime.datetime] = None) -> str**
+- **get_next_month_first_day(pattern: Optional[str] = None, reference_date: Optional[datetime.datetime] = None) -> str**
+- **get_next_month_last_day(pattern: Optional[str] = None, reference_date: Optional[datetime.datetime] = None) -> str**
+- **get_next_period_info(reference_date: Optional[datetime.datetime] = None) -> Dict[str, str]**
+- **get_previous_month(pattern: Optional[str] = None, reference_date: Optional[datetime.datetime] = None) -> str**
+- **get_previous_month_first_day(pattern: Optional[str] = None, reference_date: Optional[datetime.datetime] = None) -> str**
+- **get_previous_month_last_day(pattern: Optional[str] = None, reference_date: Optional[datetime.datetime] = None) -> str**
+- **get_previous_period_info(reference_date: Optional[datetime.datetime] = None) -> Dict[str, str]**
+- **get_previous_year(pattern: Optional[str] = None, reference_date: Optional[datetime.datetime] = None) -> str**
+
 ## Module `lib.bootstrap.cfgproperties`
 
-*Source* : `C:\cyben71\PYTHON_PROJECT\EssencePy\lib\bootstrap\cfgproperties.py`
+*Source* : `/home/bgonzalez/EssencePy/lib/bootstrap/cfgproperties.py`
 
 
 ### Class `ConfigProperties`
@@ -165,6 +239,11 @@ A recurse method is set to solve all crossed references from ${VAR}.
 Config files used by this class:
 - conf/env.conf : mainly storing python environment variables like python executer location.
 - conf/application.properties : contains properties used par application.
+
+Environment variable resolution order for ${VAR} placeholders:
+1. .env file (dotenv) located next to application.properties, or in cwd as fallback — takes priority (cf. AppEnv)
+2. OS session environment variables (os.environ) as fallback
+3. Unresolved placeholder kept as-is
 
 - **get(self, key: str, default: Optional[str] = None, strip_values: bool = True) -> Any**
 
@@ -186,7 +265,7 @@ Config files used by this class:
 
 ## Module `lib.bootstrap.cfgyaml`
 
-*Source* : `C:\cyben71\PYTHON_PROJECT\EssencePy\lib\bootstrap\cfgyaml.py`
+*Source* : `/home/bgonzalez/EssencePy/lib/bootstrap/cfgyaml.py`
 
 
 ### Class `ConfigYaml`
@@ -195,6 +274,11 @@ Class for handling config files application.yaml.
 
 Config files used by this class:
 - conf/application.yaml : contains properties used by application
+
+Environment variable resolution order for ${VAR} placeholders:
+1. .env file (dotenv) located next to application.yaml, or in cwd as fallback — takes priority (cf. AppEnv)
+2. OS session environment variables (os.environ) as fallback
+3. Unresolved placeholder kept as-is
 
 - **get(self, key: str, default: Optional[str] = None, root: Optional[Dict[str, Any]] = None, strip_values: Optional[bool] = None) -> Any**
 
@@ -220,7 +304,7 @@ Config files used by this class:
 
 ## Module `lib.bootstrap.context`
 
-*Source* : `C:\cyben71\PYTHON_PROJECT\EssencePy\lib\bootstrap\context.py`
+*Source* : `/home/bgonzalez/EssencePy/lib/bootstrap/context.py`
 
 
 ### Class `Context`
@@ -228,7 +312,7 @@ Config files used by this class:
 Allow to display properly modules or main variables into a context called 'epy'.
 Usefull for IDE like Vscode.
 
-- **load_class(self, module_name: str, class_name: str, args: list[typing.Any] = []) -> Any**
+- **load_class(self, module_name: str, class_name: str = '', args: List[Any] = [], *, cls_type: Optional[Type[~T]] = None) -> Union[~T, Any]**
 
     Allow to load and instanciate your own python class (outside of lib/bootstrap).
 
@@ -241,6 +325,7 @@ Usefull for IDE like Vscode.
     | `module_name (str)` | Module name (without extension) to load. Ex: module_name = 'my_dummy_class' |
     | `class_name (str, optional)` | Class name to load. Defaults to None. |
     | `args (list, optional)` | List of arguments required by module. Defaults to []. |
+    | `cls_type (Type[T], optional)` | Expected class type for static analysis. Defaults to None. |
 
 
     **Returns**
@@ -251,12 +336,16 @@ Usefull for IDE like Vscode.
 
     ```python
     # Load my custom class
-    cls = epy.load_class(module_name='my_dummy_class', args=[epy, APPLICATION_NAME])
+    cls: MyDummyClass = epy.load_class(
+    module_name='my_dummy_class', 
+    args=[epy, APPLICATION_NAME]
+    cls_type=MyDummyClass
+    )
     ```
 
 ## Module `lib.bootstrap.docgenerator`
 
-*Source* : `C:\cyben71\PYTHON_PROJECT\EssencePy\lib\bootstrap\docgenerator.py`
+*Source* : `/home/bgonzalez/EssencePy/lib/bootstrap/docgenerator.py`
 
 
 ### Class `DocGenerator`
@@ -301,7 +390,7 @@ The output is a Markdown file.
 
 ## Module `lib.bootstrap.logger`
 
-*Source* : `C:\cyben71\PYTHON_PROJECT\EssencePy\lib\bootstrap\logger.py`
+*Source* : `/home/bgonzalez/EssencePy/lib/bootstrap/logger.py`
 
 
 ### Class `Logger`
@@ -418,7 +507,7 @@ keeping up to backup_count previous files.
 
 ## Module `my_dummy_class`
 
-*Source* : `C:\cyben71\PYTHON_PROJECT\EssencePy\lib\my_dummy_class.py`
+*Source* : `/home/bgonzalez/EssencePy/lib/my_dummy_class.py`
 
 
 ### Class `Dummy`

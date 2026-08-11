@@ -1,6 +1,6 @@
 # EssencePy releases
 
-## Version 2.2.1 (2026-MM-DD)
+## Version 2.3.0 (2026-MM-DD)
 
 ### Releases - Description
 Add a new class in EPY for generating technical documentation of current project or a specific class/module. <br>
@@ -8,13 +8,17 @@ Add a new class in EPY for generating technical documentation of current project
 ```textile
 1) Upgrade 'RELEASE.md' & 'README.md'
 2) Under './lib/bootstrap/' directory:
-   > Enhancing `CfgProperties` class by handling dotenv file (version 1.1.0)
-   > Enhancing `CfgYaml` class by handling dotenv file (version 1.1.0)
-   > Adding new functions to copy and move files in `AppEnv` class (version 1.0.3)
+   > `AppEnv` class: Dotenv file handling (version 1.1.0)
+   > `AppEnv` class: New functions to copy/move files (version 1.1.0)
+   > `AppEnv` class: New functions to enable DEV_MODE (version 1.1.0)
+   > `init_code` class: Enhancing displaying with DEV_MODE and .env file (version 1.1.0)
+   + Adding new `Calendar` class to handle dates and time periods (version 1.0.0)
+   > Fix `Logger` class to use calendar instead of appenv class when creating log file (version 2.0.1)
 3) Under './notebooks/' directory:
    + Adding explainations for environment variable resolution order
 4) Under './docs/' directory:
-   + Adding document for deploying Python without administrator's rights 
+   + Adding document for deploying Python without administrator's rights
+   > Regenerating documents with new functions 
 5) Under './scripts/' directory:
    > Translating comments (FR -> US) on all powershell scripts
    > Enhancing 'app-start.ps1' to be called by a run.bat regardless of where the script was called from (batch file, scheduler, etc.)

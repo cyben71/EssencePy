@@ -2,10 +2,11 @@
 # Config file "YAML" #
 # ####################
 
-user_linux: "${USER}"         # OS env. variable from Linux
+user_linux: "${USERNAME}"         # OS env. variable from Linux
 user_windows: "${USERNAME}"   # OS env. variable from Windows
-var_env: "${PWDTEST}"         # User env. var
-placeholder: "My Application_${PWDTEST}"
+var_env: "${PWDTEST}"         # This variable come from dotenv file
+hostname: "${HOSTNAME}"
+placeholder: "My Application_from_${HOSTNAME}"  # 
 
 aDictionnary: {"Name": "Karl ", "Age": 24, "Address": " France "}
 

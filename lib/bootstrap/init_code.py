@@ -1,4 +1,4 @@
-__version__ = "1.0.5"
+__version__ = "1.1.0"
 
 import importlib.util
 import inspect
@@ -13,6 +13,7 @@ from lib.bootstrap import cfgproperties
 from lib.bootstrap import logger
 from lib.bootstrap import appenv
 from lib.bootstrap import docgenerator
+from lib.bootstrap import calendar
 
 T = TypeVar('T')
 
@@ -25,6 +26,7 @@ def init() -> None:
     
     # load and instanciate classes in context
     context.appenv = appenv.AppEnv()
+    context.calendar = calendar.Calendar()
     context.cfgyaml = cfgyaml.ConfigYaml(app_home=context.APPLICATION_HOME)
     context.cfgprops = cfgproperties.ConfigProperties(app_home=context.APPLICATION_HOME)
 
@@ -159,11 +161,22 @@ def summarize_context() -> None:
 
     def color(text: str, code: str) -> str:
         return f"\033[{code}m{text}\033[0m" if supports_color() else text
+    
+    def mask(value: Any) -> Any:
+        """Applique appenv.mask() si disponible, sinon renvoie value inchangée."""
+        if isinstance(value, str) and hasattr(context, "appenv"):
+            return context.appenv.mask(value)
+        return value
 
     python_version = platform.python_version()
-    interpreter_path = sys.executable
+    interpreter_path = mask(sys.executable)
     is_venv = sys.prefix != sys.base_prefix
     venv_info = "✅ Virtualenv actif" if is_venv else "❌ Pas de virtualenv"
+    dev_mode_on = hasattr(context, "appenv") and context.appenv.dev_mode
+
+    # .env file info, formatted like ENVIRONMENT (✅/❌ + location)
+    dotenv_path = getattr(context, "appenv", None) and context.appenv.dotenv_path
+    dotenv_info = f"{mask(dotenv_path)}" if dotenv_path else "❌ Aucun fichier .env trouvé"
 
     # Modules dynamically loaded in context
     module_names = [
@@ -184,16 +197,23 @@ def summarize_context() -> None:
     print(f"{color('📦  ENVIRONMENT', '92')} : {venv_info}")
     print(f"{color('📦  EPY_MODULES', '92')} : {', '.join(sorted(module_names)) or 'None'}")
 
-    print(f"{color('📁  APPLICATION_HOME', '93')} : {context.APPLICATION_HOME}")
+    if dev_mode_on:
+        print(f"{color('🕶️  DEV_MODE', '95')} : ✅ actif (informations sensibles masquées ci-dessous)")
+
+    # print(f"{color('📁  APPLICATION_HOME', '93')} : {context.APPLICATION_HOME}")
+    print(f"{color('📁  APPLICATION_HOME', '93')} : {mask(context.APPLICATION_HOME)}")
     print(f"{color('📛  APPLICATION_NAME', '93')} : {context.APPLICATION_NAME}")
 
-    # Config files dynamically loaded in context
+    # Config files dynamically loaded in context (properties, yaml, env et .env)
     if hasattr(context, 'CFGENV_FILE'):
-        print(f"📘  ENV file loaded : {context.CFGENV_FILE}")
+        print(f"📘  ENV file loaded : {mask(context.CFGENV_FILE)}")
     if hasattr(context, 'CFGPROPS_FILE'):
-        print(f"📘  PROPERTIES file loaded : {context.CFGPROPS_FILE}")
+        print(f"📘  PROPERTIES file loaded : {mask(context.CFGPROPS_FILE)}")
     if hasattr(context, 'CFGYAML_FILE'):
-        print(f"📘  YAML file loaded : {context.CFGYAML_FILE}")
+        print(f"📘  YAML file loaded : {mask(context.CFGYAML_FILE)}")
+    if hasattr(context, 'CFGENV_FILE'):
+        print(f"📘  DOTENV file loaded : {mask(dotenv_info)}")
+    
     # show vars env list
     #if hasattr(context, 'envloader'):
     #    context.envloader.summarize()
@@ -201,3 +221,4 @@ def summarize_context() -> None:
     print()
     print(color("✅  Context is ready.", "92"))  # vert
     print(color(separator, "90"))
+

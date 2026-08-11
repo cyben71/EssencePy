@@ -110,12 +110,14 @@ Set-Variable -Name "VENV_PYTHON_DIR" -Value $VENV_PYTHON_DIR
 Set-Variable -Name "VENV_PYTHON_EXE" -Value $PARENT_PYTHON_EXE
 
 # ------------------------------------------------------------------------ #
-# CA bundle optionnel : si le projet definit WIN_CA_BUNDLE dans conf/env.conf
-# (chemin absolu, ou relatif a APPLICATION_HOME) et que le fichier existe,
-# on l'utilise comme CA additionnel pour pip/Python (SSL_CERT_FILE /
-# REQUESTS_CA_BUNDLE / PIP_CERT). Reste inactif si la variable n'est pas
-# definie : ne concerne que les projets qui en ont besoin (ex: proxy
-# d'inspection SSL d'entreprise) sans rien imposer aux autres.
+# Optional CA bundle file: if the project defines a CA_BUNDLE var in conf/env.conf
+# (absolute path, or path relative to APPLICATION_HOME) and the file exists,
+# it is used as an additional CA for Python (SSL_CERT_FILE /
+# REQUESTS_CA_BUNDLE). 
+# It remains completely inactive if the variable is not
+# defined: 
+# it affects only projects that require it without imposing anything on others.
+# (e.g., corporate SSL inspection proxies like zscaler)
 # ------------------------------------------------------------------------ #
 if ($CA_BUNDLE) {
     $caBundlePath = $CA_BUNDLE
@@ -125,10 +127,9 @@ if ($CA_BUNDLE) {
     if (Test-Path -Path $caBundlePath -PathType Leaf) {
         $env:SSL_CERT_FILE = $caBundlePath
         $env:REQUESTS_CA_BUNDLE = $caBundlePath
-        $env:PIP_CERT = $caBundlePath
-        LogMessage "CA bundle applique : $caBundlePath"
+        LogMessage "CA bundle loaded : $caBundlePath"
     } else {
-        LogMessage "Attention : WIN_CA_BUNDLE defini mais fichier introuvable : $caBundlePath"
+        LogMessage "Attention : CA_BUNDLE defines but file is unavailable : $caBundlePath"
     }
 }
 

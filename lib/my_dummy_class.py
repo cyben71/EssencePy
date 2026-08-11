@@ -15,7 +15,7 @@ class Dummy:
             app_name (_type_): Application name
         """
         self.app_home = epy.APPLICATION_HOME
-        self.app_name = f"{app_name}_test"
+        self.app_name = f"dummy_{app_name}_test"
 
     
     def dummy_function(self, arg1: str) -> str:
@@ -30,7 +30,7 @@ class Dummy:
         """
         str_return: str = ""
         if arg1 != "":
-            str_return = f"Hello World from {self.app_home}"
+            str_return = f"Hello World from {self.app_name}"
         else:
             str_return = f"Where is expected args ?" 
         return str_return
