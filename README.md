@@ -26,6 +26,7 @@ It brings together reusable utilities, structured code organization, and cross-p
 EssencePy/ 
 ├── app/            # Python applications folder
 ├── conf/           # Configuration files (.yaml, .properties, etc.) 
+├── docs/           # Documentation files (.md) 
 ├── lib/            # Core Python libraries
 │ └── bootstrap/    # Autoloaded main classes (e.g., bootstrap, init_code, AppEnv, ConfigYaml... etc.)
 ├── logs/           # Application logs  (folder automatically created if not existing)
@@ -58,7 +59,7 @@ Feel free to fork, extend, and adapt EssencePy to your own workflows. 💡
 
 This last action will create a **Python virtual environment** and load your required python packages. 
 
-If you want to dev with notebooks, you have to deploy 'Jupyter' package into your Python parent folder or into your virtual env. (with the requirements script for example).
+If you want to **dev with notebooks**, you have to deploy `Jupyter` package into your Python parent folder or into your virtual env. (with the requirements script for example).
 
 ### Main functions
 ```shell
@@ -91,7 +92,7 @@ foo = my_class.function()
 ```md
 > Tip: I already have a Python program.
 
-Put your Python program in "app" folder and launch it with 'app-start' script
+Put your Python program in "app" folder and launch it with the `app-start` script
 ```
 
 ```md
@@ -108,6 +109,15 @@ By default with value like: "rt/python/bin/python3"
 It is not necessary if you already have your required dependencies loaded in parent Python home or if you do not have need to isolate your program and packages. 
 
 However Python virtualenv is better for security reasons or professionnal workflow. You should use it without hesitate.
+```
+
+```md
+> Tip: Can I use a dotenv (.env) file to add variables without keeping them in project repository ?
+
+Since version 2.3.0, EssencePy handles dotenv files. 
+You just have to put your .env into project folder (it will be discovered by bootstrap). All variables from this file will be injected into Python Environment. You should get them from CfgYaml/CfgProperties Classes or `os.environ` calls.
+
+Notice: By default, `.env` files are ignored for publishing into EssencePy repository (.gitignore)
 ```
 ### Currently working with
 

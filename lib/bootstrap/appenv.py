@@ -128,15 +128,26 @@ class AppEnv:
             return platform.node()
 
     @staticmethod
-    def get_username():
+    def get_username() -> str:
         """
         Retrieves the name of the current user logged into the system.
-        This function is cross-platform and works on Linux, Windows, and macOS.
-        You can bypass current username by setting your own USER or USERNAME variable with a .env file
+
+        This function first checks the environment variables 'USERNAME' (Windows) and 'USER' (Linux/macOS).
+        If neither is available or is empty, it falls back to `getpass.getuser()`.
+        Compatible with Linux, Windows, and macOS.
+
         Returns:
             str: The username of the current user.
         """
-        return getpass.getuser()
+
+        # Check OS variables first
+        username = os.getenv('USERNAME') or os.getenv('USER')
+
+        # Default value by getpass.getuser() if username is null
+        if not username:
+            username = getpass.getuser()
+
+        return username
 
     @staticmethod
     def is_folder_exists(location: str) -> bool:
@@ -423,7 +434,7 @@ class AppEnv:
                     if value is not None:
                         self._inject(key, value)
 
-            # Publie le chemin résolu sur context.CFGENV_FILE (même pattern que ConfigYaml)
+            # Publishing resolved path of .env file to context.CFGENV_FILE (same pattern as ConfigYaml)
             context_module = sys.modules.get("lib.bootstrap.context")
             if context_module and hasattr(context_module, "context"):
                 context_module.context.CFGENV_FILE = self._dotenv_path

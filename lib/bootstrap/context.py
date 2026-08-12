@@ -6,6 +6,7 @@ from types import SimpleNamespace
 from lib.bootstrap.cfgyaml import ConfigYaml        
 from lib.bootstrap.cfgproperties import ConfigProperties
 from lib.bootstrap.appenv import AppEnv
+from lib.bootstrap.calendar import Calendar
 from lib.bootstrap.logger import Logger
 from lib.bootstrap.docgenerator import DocGenerator
 
@@ -23,6 +24,7 @@ class Context(SimpleNamespace):
     cfgyaml: ConfigYaml  
     cfgprops: ConfigProperties
     appenv: AppEnv
+    cal: Calendar
     log: Logger
     doc: DocGenerator
     CFGYAML_FILE: str
