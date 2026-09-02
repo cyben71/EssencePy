@@ -320,12 +320,63 @@ class AppEnv:
             print(f"File {source} not copied: {e}")
             return False
     
+
     @property
     def dotenv_path(self) -> Optional[str]:
         """Chemin absolu du .env chargé, ou None si aucun trouvé."""
         return self._dotenv_path
 
-    
+
+    @staticmethod
+    def find_files(location: str, pattern: str, recursive: bool = False) -> List[str]:
+        """
+        Rechercher dans un dossier les fichiers dont le nom correspond à un motif
+        de type SQL LIKE, où le caractère '%' représente une chaîne de caractères
+        quelconque (équivalent du '*' en shell).
+
+        Le motif permet de combiner les deux critères habituels :
+            1) le nom commence par une chaîne donnée   -> "XXX%"
+            2) l'extension correspond à un motif donné -> "%.ext" ou "%.%"
+
+        Args:
+            location (str): Dossier dans lequel effectuer la recherche.
+            pattern (str): Motif de recherche avec '%' comme joker.
+                Exemples :
+                    "XXX%.%"        -> fichiers commençant par "XXX", extension quelconque
+                    "%.pdf"         -> tous les fichiers avec l'extension .pdf
+                    "rapport_%.csv" -> fichiers "rapport_..." avec extension .csv
+            recursive (bool): Si True, recherche aussi dans les sous-dossiers.
+                Par défaut False (recherche seulement dans `location`).
+
+        Returns:
+            List[str]: Liste des chemins (str) des fichiers trouvés.
+                Cette liste peut être directement utilisée comme `source`
+                dans les méthodes mv_file() ou cp_file().
+
+        Example:
+            # Fichiers commençant par "XXX" quelle que soit l'extension
+            files = epy.appenv.find_files("data/", "XXX%.%")
+
+            # Déplacer tous les fichiers trouvés vers un dossier d'archive
+            for f in files:
+                epy.appenv.mv_file(f, "archive/2026/")
+        """
+        if not AppEnv.is_folder_exists(location):
+            print(f"Folder {location} is not found or is not available")
+            return []
+
+        # Conversion du motif SQL LIKE ('%') vers un motif glob ('*')
+        glob_pattern = pattern.replace("%", "*")
+        base = Path(location)
+
+        try:
+            matches = base.rglob(glob_pattern) if recursive else base.glob(glob_pattern)
+            files = [str(f) for f in matches if f.is_file()]
+            return files
+        except Exception as e:
+            print(f"Search failed in {location} with pattern {pattern}: {e}")
+            return []
+
     ######################################
     ##### PRIVATE METHOD & FUNCTIONS #####
     ######################################
